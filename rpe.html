@@ -279,7 +279,7 @@ const configured=!/PEGAR/.test(CONFIG.clientId);
 async function token(){
   const req={scopes:CONFIG.scopes,account};
   try{ return (await pca.acquireTokenSilent(req)).accessToken; }
-  catch(e){ const r=await pca.acquireTokenPopup(req); account=r.account; return r.accessToken; }
+  catch(e){ await pca.acquireTokenRedirect(req); throw e; }
 }
 async function readLive(){
   if(!account) return;
@@ -308,10 +308,7 @@ async function initLive(){
   if(!account){ setChip("warn","Copia al 19/09 · iniciá sesión para ver en vivo"); srcMsg("Iniciá sesión con tu cuenta de 333 para leer el Excel de SharePoint."); $("login").hidden=false; return; }
   readLive(); clearInterval(timer); timer=setInterval(readLive,CONFIG.refreshMs);
 }
-$("login").addEventListener("click",async()=>{
-  try{ const r=await pca.loginPopup({scopes:CONFIG.scopes}); account=r.account; initLive(); }
-  catch(e){ pca.loginRedirect({scopes:CONFIG.scopes}); }
-});
+$("login").addEventListener("click",()=>{ pca.loginRedirect({scopes:CONFIG.scopes}); });
 $("refresh").addEventListener("click",()=>{ if(account) readLive(); });
 
 render();
