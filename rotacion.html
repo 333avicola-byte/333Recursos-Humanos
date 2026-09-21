@@ -82,6 +82,10 @@ td.num{font-size:13px}
 .tag.temp{background:#FDECEC;color:#B03030;margin-left:6px}
 details{margin-top:8px} summary{cursor:pointer;font:600 13px var(--display);color:var(--azul)}
 .muted{color:var(--muted)}
+.years{display:flex;gap:8px;flex-wrap:wrap}
+.years button{border-radius:999px;padding:8px 16px;font-weight:600}
+.years button[aria-pressed="true"]{background:var(--azul);color:#fff;border-color:var(--azul)}
+tr.sel td{background:#EEF5FC;font-weight:600}
 </style>
 </head>
 <body>
@@ -104,11 +108,13 @@ details{margin-top:8px} summary{cursor:pointer;font:600 13px var(--display);colo
 
   <section class="hero" aria-label="Índice del período">
     <div class="herotext">
-      <div class="eyebrow">Índice de rotación del período</div>
+      <div class="eyebrow" id="heroEye">Índice de rotación del período</div>
       <div class="big" id="heroVal">—<small id="heroUnit"></small></div>
       <p id="heroTxt">Bajas acumuladas sobre la plantilla media de los meses cerrados.</p>
     </div>
   </section>
+
+  <nav class="years" id="years" aria-label="Elegir año"></nav>
 
   <section class="kpis">
     <div class="kpi"><div class="eyebrow">Rotación voluntaria</div><div class="v" id="kVol">—</div><div class="s" id="kVolS"></div></div>
@@ -124,14 +130,19 @@ details{margin-top:8px} summary{cursor:pointer;font:600 13px var(--display);colo
       <div class="chart"><canvas id="c1" aria-label="Altas, bajas y dotación"></canvas></div>
     </div>
     <div class="panel">
-      <h2>Rotación por filial</h2>
-      <p class="sub">Acumulado del período</p>
-      <div class="tablebox"><table>
-        <thead><tr><th>Filial</th><th>Dot. inicial</th><th>Altas</th><th>Bajas</th><th>Voluntarias</th><th>Dot. actual</th><th>Índice</th></tr></thead>
-        <tbody id="tbFil"><tr><td colspan="7" class="muted">Sin datos todavía</td></tr></tbody>
-      </table></div>
-      <p class="sub" style="margin-top:10px">Las filiales chicas no muestran porcentaje: una sola baja distorsiona el índice.</p>
+      <h2>Comparación entre años</h2>
+      <p class="sub">Índice acumulado mes a mes: bajas hasta ese mes ÷ plantilla media hasta ese mes</p>
+      <div class="chart"><canvas id="c2" aria-label="Índice acumulado por año"></canvas></div>
     </div>
+  </section>
+
+  <section class="panel">
+    <h2>Histórico anual</h2>
+    <p class="sub">Años cerrados con 12 meses; el año en curso con los meses cerrados</p>
+    <div class="tablebox"><table>
+      <thead><tr><th>Año</th><th>Meses</th><th>Dot. inicial</th><th>Altas</th><th>Bajas</th><th>Voluntarias</th><th>Tempranas</th><th>Plantilla media</th><th>Índice</th><th>Voluntaria</th><th>Anualizada</th></tr></thead>
+      <tbody id="tbHist"><tr><td colspan="11" class="muted">Sin datos todavía</td></tr></tbody>
+    </table></div>
   </section>
 
   <section class="panel">
@@ -164,14 +175,34 @@ const pf=n=>n==null||isNaN(n)?"—":(n*100).toLocaleString("es-AR",{minimumFract
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const serial=v=>typeof v==="number"&&v>20000&&v<80000?new Date(Date.UTC(1899,11,30)+v*86400000):null;
 const dmy=d=>d?String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0")+"/"+d.getUTCFullYear():"";
-let chart, pca=null, account=null, timer=null;
+let chart, chart2, pca=null, account=null, timer=null, P=null, MOVS=[], SEL=null;
+const COLORES=["#1F6DB1","#E87722","#8CC63F","#53565A","#2D85D1","#F5A35C"];
+function mostrar(){
+  const anios=aniosDisponibles(P), res={};
+  anios.forEach(y=>{ const pa=paramAnio(P,y); if(pa.filiales.length&&pa.corte>0) res[y]=analizar(pa,MOVS); });
+  const ys=Object.keys(res).map(Number);
+  $("years").innerHTML=ys.map(y=>`<button type="button" aria-pressed="${y===SEL}" data-y="${y}">${y}${y===P.actual&&P.corte<12?" · en curso":""}</button>`).join("");
+  $("years").querySelectorAll("button").forEach(b=>b.onclick=()=>{SEL=+b.dataset.y; mostrar();});
+  pintar(res[SEL]);
+  $("tbHist").innerHTML=ys.slice().reverse().map(y=>{const R=res[y]; return `<tr class="${y===SEL?"sel":""}"><td>${y}</td><td>${R.corte}</td><td>${R.inicial}</td><td>${R.totAltas}</td><td>${R.totBajas}</td><td>${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)}</td><td>${R.tempranas}</td><td>${nf(R.media)}</td><td>${pf(R.indice)}</td><td>${pf(R.iVol)}</td><td>${pf(R.anual)}</td></tr>`;}).join("");
+  if(window.Chart){
+    const ds=ys.map((y,i)=>({label:String(y),data:res[y].acum.map(v=>v==null?null:+(v*100).toFixed(2)),borderColor:COLORES[i%COLORES.length],backgroundColor:COLORES[i%COLORES.length],
+      borderWidth:y===SEL?3.5:2,pointRadius:y===SEL?3.5:0,tension:.25,borderDash:y===SEL?[]:[6,5]}));
+    const data={labels:MESES.map(m=>m.slice(0,3)),datasets:ds};
+    const opts={maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+      plugins:{legend:{position:"bottom",labels:{boxWidth:10,boxHeight:10}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toLocaleString("es-AR")}%`}}},
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{callback:v=>v+"%"},grid:{color:css("--line")}}}};
+    if(chart2){chart2.data=data;chart2.options=opts;chart2.update();} else chart2=new Chart($("c2"),{type:"line",data,options:opts});
+  }
+}
 
 function setChip(kind,text){ $("chip").className="chip "+kind; $("chipText").textContent=text; }
 
 /* -------- cálculo -------- */
 function analizar(param, movs){
   const anio=param.anio, corte=param.corte, inicial=param.filiales.reduce((a,f)=>a+f.inicial,0);
-  const vig=movs.filter(m=>m.fecha&&m.fecha.getUTCFullYear()===anio&&m.fecha.getUTCMonth()<corte);
+  const medidas=new Set(param.filiales.map(f=>f.nombre));
+  const vig=movs.filter(m=>m.fecha&&m.fecha.getUTCFullYear()===anio&&m.fecha.getUTCMonth()<corte&&medidas.has(m.filial));
   const altas=Array(12).fill(0), bajas=Array(12).fill(0), vol=Array(12).fill(0), temp=Array(12).fill(0);
   vig.forEach(m=>{const i=m.fecha.getUTCMonth();
     if(m.tipo==="alta") altas[i]++; else { bajas[i]++; if(m.clase==="Voluntaria") vol[i]++; if(m.temprana) temp[i]++; }});
@@ -187,19 +218,21 @@ function analizar(param, movs){
     const act=f.inicial+a-b, base=(f.inicial+act)/2;
     return {...f,altas:a,bajas:b,vol:v,actual:act,indice:base>=param.umbral&&base>0?b/base:null};
   });
-  return {anio,corte,inicial,altas,bajas,vol,dot,media,indice,
+  const acumIdx=[]; let sb=0, sd=0;
+  for(let i=0;i<corte;i++){ sb+=bajas[i]; sd+=dot[i]; acumIdx.push(sd>0?sb/(sd/(i+1)):null); }
+  return {acum:acumIdx,ambito:param.filiales.map(f=>f.nombre).join(" + "),anio,corte,inicial,altas,bajas,vol,dot,media,indice,
     iVol:media>0?tot(vol)/media:null, anual:indice!=null?indice*12/corte:null,
     tempranas:tot(temp), totBajas:tot(bajas), totAltas:tot(altas), filiales, movs:vig};
 }
 
 function pintar(R){
   $("heroVal").firstChild.nodeValue=pf(R.indice);
-  $("heroTxt").textContent=`${R.totBajas} bajas entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}, sobre una plantilla media de ${nf(R.media)} personas.`;
+  $("heroEye").textContent=`Índice de rotación · ${R.anio}${R.corte<12?" (en curso)":""}`;
+  $("heroTxt").textContent=`${R.ambito}: ${R.totBajas} bajas entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}, sobre una plantilla media de ${nf(R.media)} personas.`;
   $("kVol").textContent=pf(R.iVol); $("kVolS").textContent=`${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)} de ${R.totBajas} bajas`;
-  $("kAnual").textContent=pf(R.anual); $("kAnualS").textContent=`Ritmo de ${R.corte} ${R.corte===1?"mes":"meses"} llevado a 12`;
+  $("kAnual").textContent=pf(R.anual); $("kAnualS").textContent=`Ritmo de ${R.corte} ${R.corte===1?"mes":"meses"} llevado a 12`; if(R.corte===12) $("kAnualS").textContent="Año cerrado: coincide con el índice";;
   $("kBase").textContent=nf(R.media); $("kBaseS").textContent=`Cierre: ${R.dot[R.dot.length-1]} · inicio: ${R.inicial}`;
   $("kTemp").textContent=R.tempranas;
-  $("tbFil").innerHTML=R.filiales.map(f=>`<tr><td>${f.nombre}</td><td>${f.inicial}</td><td>${f.altas}</td><td>${f.bajas}</td><td>${f.vol}</td><td>${f.actual}</td><td>${f.indice==null?'<span class="muted">chica</span>':pf(f.indice)}</td></tr>`).join("");
   const ord=[...R.movs].sort((a,b)=>b.fecha-a.fecha);
   $("tbMovs").innerHTML=ord.map(m=>`<tr><td><span class="tag ${m.tipo}">${m.tipo}</span></td><td>${dmy(m.fecha)}</td><td>${m.nombre||""}</td><td>${m.puesto||""}</td><td>${m.filial||""}</td><td>${m.clase||""}</td><td>${m.antig==null?"—":nf(m.antig)+" años"}${m.temprana?'<span class="tag temp">temprana</span>':""}</td></tr>`).join("")||'<tr><td colspan="7" class="muted">Sin movimientos</td></tr>';
   const labels=MESES.slice(0,R.corte).map(m=>m.slice(0,3));
@@ -217,11 +250,16 @@ function pintar(R){
 /* -------- lectura del Excel -------- */
 function filaValores(rows,headRow){ return rows.slice(headRow+1); }
 function leerParametros(v){
-  const anio=v[4][2], corte=v[5][2], umbral=v[6][2]||15, filiales=[];
-  for(let r=9;r<v.length;r++){ const n=v[r][1], i=v[r][2];
-    if(typeof n==="string"&&n.trim()&&typeof i==="number") filiales.push({nombre:n.trim(),inicial:i}); else break; }
-  return {anio:+anio,corte:+corte,umbral:+umbral,filiales};
+  const actual=+v[4][2], corte=+v[5][2], umbral=+(v[6][2]||15), filas=[];
+  for(let r=9;r<v.length;r++){ const y=v[r][1], n=v[r][2], i=v[r][3], m=String(v[r][4]??"").trim().toLowerCase();
+    if(typeof y==="number"&&typeof n==="string"&&n.trim()&&typeof i==="number"&&m!=="no") filas.push({anio:y,nombre:n.trim(),inicial:i}); }
+  return {actual,corte,umbral,filas};
 }
+function paramAnio(P,y){
+  const corte=y<P.actual?12:(y===P.actual?P.corte:0);
+  return {anio:y,corte,umbral:P.umbral,filiales:P.filas.filter(f=>f.anio===y)};
+}
+function aniosDisponibles(P){ return [...new Set(P.filas.map(f=>f.anio))].filter(y=>y<=P.actual).sort((a,b)=>a-b); }
 function leerMovimientos(v){
   const out=[];
   for(let r=5;r<v.length;r++){
@@ -260,13 +298,15 @@ async function leer(){
     const t=await token(), loc=await ubicar(t);
     const base=`https://graph.microsoft.com/v1.0/drives/${loc.driveId}/items/${loc.itemId}/workbook/worksheets`;
     const [pa,mo]=await Promise.all([
-      g(`${base}('Parametros')/range(address='A1:F40')?$select=values`,t),
-      g(`${base}('Movimientos')/range(address='A1:K400')?$select=values`,t)]);
-    const param=leerParametros(pa.values||[]), movs=leerMovimientos(mo.values||[]);
-    if(!param.filiales.length) throw new Error("Parametros vacío");
-    pintar(analizar(param,movs));
+      g(`${base}('Parametros')/range(address='A1:F60')?$select=values`,t),
+      g(`${base}('Movimientos')/range(address='A1:K1000')?$select=values`,t)]);
+    P=leerParametros(pa.values||[]); MOVS=leerMovimientos(mo.values||[]);
+    const anios=aniosDisponibles(P);
+    if(!anios.length) throw new Error("Parametros vacío");
+    if(!anios.includes(SEL)) SEL=anios.includes(P.actual)?P.actual:anios[anios.length-1];
+    mostrar();
     const hh=new Date().toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
-    setChip("live",`En vivo · ${MESES[param.corte-1]} ${param.anio} · leído ${hh}`);
+    setChip("live",`En vivo · ${MESES[P.corte-1]} ${P.actual} · leído ${hh}`);
   }catch(e){
     const m=String(e.message||e);
     setChip("err","No se pudo leer el Excel");
