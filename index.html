@@ -38,7 +38,9 @@ nav{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center
 .hero p{margin-top:22px;font-size:clamp(17px,2vw,24px);font-weight:400;color:var(--muted);max-width:30ch;line-height:1.35;letter-spacing:-.01em}
 .hero .cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 22px;border-radius:980px;font-size:15px;font-weight:500;transition:transform .2s,background .2s}
-.btn.pri{background:var(--azul);color:#fff}.btn.pri:hover{background:#185a93;transform:scale(1.03)}
+.btn.pri{background:var(--azul);color:#fff}
+@media (hover:hover){.btn.pri:hover{background:#185a93;transform:scale(1.03)}}
+.btn,.rail a,.vis{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .btn.sec{color:var(--azul)}.btn.sec:hover{text-decoration:underline}
 .orb{position:absolute;width:62vmax;height:62vmax;border-radius:50%;z-index:-1;filter:blur(60px);opacity:.55;
   background:radial-gradient(circle at 30% 30%,var(--claro),transparent 60%),radial-gradient(circle at 70% 70%,rgba(45,133,209,.25),transparent 55%)}
@@ -137,6 +139,8 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
   .pre{opacity:1;transform:none}.draw{stroke-dashoffset:0}.bar{transform:none}.lvl{opacity:1;transform:none}.fade{opacity:1}.pop{transform:none}
   .hero{height:auto}.hero-stick{position:relative;height:auto;min-height:88vh}
 }
+body.cine .k2,body.cine .k3,body.cine .k4,body.cine .k5{transition:none}
+body.cine .btn.k5{transition:background .2s}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 .lenis.lenis-stopped{overflow:hidden}
@@ -312,7 +316,7 @@ function animar(){
 }
 function bindTilt(){
   document.querySelectorAll(".vis").forEach(v=>{
-    v.addEventListener("pointermove",ev=>{ const r=v.getBoundingClientRect(), x=(ev.clientX-r.left)/r.width-.5, y=(ev.clientY-r.top)/r.height-.5;
+    v.addEventListener("pointermove",ev=>{ if(ev.pointerType!=="mouse") return; const r=v.getBoundingClientRect(), x=(ev.clientX-r.left)/r.width-.5, y=(ev.clientY-r.top)/r.height-.5;
       v.style.transform=`perspective(900px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`; });
     v.addEventListener("pointerleave",()=>{ v.style.transform=""; });
   });
