@@ -72,40 +72,82 @@ nav{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center
 @media (max-width:420px){.vis svg{width:96%}.tool h2{font-size:40px}}
 
 
-/* ===== ESCENAS tipo keynote para cada indicador ===== */
+/* ===== ESCENAS: todo en el compositor (transform/opacity), sin JS por cuadro ===== */
 .stage{width:100%;display:flex;align-items:center;justify-content:center;position:relative}
 .vwrap{width:100%}
 .tool:nth-of-type(odd) .tool-in .vwrap{order:-1}
-.bignum{display:none}
-.rail{display:none}
-body.cine .tool{display:block;min-height:0;height:190vh;padding:0;background:transparent!important}
-body.cine .stage{position:sticky;top:52px;height:calc(100vh - 52px);overflow:hidden;padding:0 22px}
 .halo{display:none}
-body.cine .halo{display:block;position:absolute;inset:0;z-index:-2;opacity:0;will-change:opacity;pointer-events:none;
-  background:radial-gradient(70% 60% at 72% 45%,#E4EFFA 0%,rgba(228,239,250,0) 70%)}
-body.cine .tool:nth-of-type(odd) .halo{background:radial-gradient(70% 60% at 28% 45%,#E4EFFA 0%,rgba(228,239,250,0) 70%)}
-body.cine .vwrap,body.cine .k2,body.cine .k3,body.cine .k4,body.cine .k5{will-change:transform,opacity}
-body.cine .vis{box-shadow:0 50px 120px -40px rgba(14,27,43,.35)}
-body.cine .k5{display:inline-flex}
-body.cine .rail{display:flex;position:fixed;right:28px;top:50%;transform:translateY(-50%);flex-direction:column;gap:14px;z-index:40;
-  padding:12px 9px;border-radius:999px;background:rgba(251,251,253,.6);backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
-  box-shadow:0 0 0 1px rgba(14,27,43,.06);opacity:0;transition:opacity .6s cubic-bezier(.2,.8,.2,1);pointer-events:none}
-body.cine .rail.on{opacity:1;pointer-events:auto}
+.vis{box-shadow:0 30px 60px -30px rgba(14,27,43,.28)!important}
+.tool:not(.visible) .float{animation-play-state:paused}
+
+/* Riel de puntitos */
+.rail{display:flex;position:fixed;right:22px;top:50%;transform:translateY(-50%);flex-direction:column;gap:14px;z-index:40;
+  padding:12px 9px;border-radius:999px;background:rgba(251,251,253,.92);box-shadow:0 0 0 1px rgba(14,27,43,.07),0 8px 24px -12px rgba(14,27,43,.25);
+  opacity:0;transition:opacity .5s ease;pointer-events:none}
+.rail.on{opacity:1;pointer-events:auto}
 .rail a{display:block;width:8px;height:8px;position:relative;z-index:1}
 .rail .dot{display:block;width:8px;height:8px;border-radius:50%;background:rgba(14,27,43,.18);transition:background .3s}
 .rail a:hover .dot{background:rgba(14,27,43,.4)}
- @media (max-width:820px){
-  body.cine .tool{height:170vh}
-  body.cine .tool-in{gap:18px}
-  body.cine .vwrap{max-width:min(380px,40vh);width:100%}
-  body.cine .tool h2{font-size:clamp(30px,8vw,44px);margin:6px 0 10px}
-  body.cine .tool p{font-size:15px}
-  body.cine .tool .btn{margin-top:16px}
-  body.cine .rail{right:4px;padding:10px 7px}
-  .rail .pill{left:7px!important;top:10px!important}
-}
-.rail .pill{position:absolute;left:9px;top:12px;width:8px;height:22px;border-radius:4px;background:var(--azul);z-index:2;pointer-events:none;will-change:transform}
-.rail .bar-p{display:none}
+.rail .pill{position:absolute;left:9px;top:5px;width:8px;height:22px;border-radius:4px;background:var(--azul);z-index:2;pointer-events:none;
+  transition:transform .6s cubic-bezier(.16,1,.3,1)}
+@media (max-width:820px){.rail{right:6px;padding:10px 7px}.rail .pill{left:7px;top:3px}}
+
+/* A) Navegadores con animaciones ligadas al scroll (Chrome, Edge, Safari 26+): escenas fijas y sincronizadas con el scroll */
+@supports (animation-timeline: view()){
+@media (prefers-reduced-motion:no-preference){
+  body.sda .tool{display:block;min-height:0;height:200vh;padding:0;position:relative;view-timeline-name:--esc;view-timeline-axis:block}
+  body.sda .tool + .tool{margin-top:-45vh}
+  body.sda .stage{position:sticky;top:52px;height:calc(100vh - 52px);overflow:hidden;padding:0 22px;pointer-events:none}
+  body.sda .stage .btn,body.sda .stage .vis{pointer-events:auto}
+  body.sda .halo{display:block;position:absolute;inset:0;z-index:-2;pointer-events:none;opacity:0;
+    background:radial-gradient(70% 60% at 72% 45%,#E4EFFA 0%,rgba(228,239,250,0) 70%);animation:haloK linear both;animation-timeline:--esc}
+  body.sda .tool:nth-of-type(odd) .halo{background:radial-gradient(70% 60% at 28% 45%,#E4EFFA 0%,rgba(228,239,250,0) 70%)}
+  body.sda .tool{background:transparent!important}
+  body.sda .vwrap{animation:visK linear both;animation-timeline:--esc}
+  body.sda .tool:nth-of-type(odd) .vwrap{animation-name:visKi}
+  body.sda .k2,body.sda .k3,body.sda .k4,body.sda .k5{animation:txtK linear both;animation-timeline:--esc}
+  body.sda .tool:nth-of-type(odd) .k2,body.sda .tool:nth-of-type(odd) .k3,body.sda .tool:nth-of-type(odd) .k4,body.sda .tool:nth-of-type(odd) .k5{animation-name:txtKi}
+  body.sda .k3{animation-range:cover 3% cover 100%}
+  body.sda .k4{animation-range:cover 6% cover 100%}
+  body.sda .k5{animation-range:cover 9% cover 100%}
+  body.sda .tool:last-of-type .vwrap{animation-name:visKlast}
+  body.sda .tool:last-of-type:nth-of-type(odd) .vwrap{animation-name:visKlasti}
+  body.sda .tool:last-of-type .k2,body.sda .tool:last-of-type .k3,body.sda .tool:last-of-type .k4,body.sda .tool:last-of-type .k5{animation-name:txtKlast}
+  body.sda .tool:last-of-type:nth-of-type(odd) .k2,body.sda .tool:last-of-type:nth-of-type(odd) .k3,body.sda .tool:last-of-type:nth-of-type(odd) .k4,body.sda .tool:last-of-type:nth-of-type(odd) .k5{animation-name:txtKlasti}
+  body.sda #heroTxt{animation:heroK linear both;animation-timeline:scroll(root);animation-range:0 100vh}
+  body.sda #orb{animation:orbK linear both;animation-timeline:scroll(root);animation-range:0 100vh}
+  @media (max-width:820px){
+    body.sda .tool{height:190vh}
+    body.sda .tool-in{gap:18px}
+    body.sda .vwrap{max-width:min(380px,40vh)}
+    body.sda .tool h2{font-size:clamp(30px,8vw,44px);margin:6px 0 10px}
+    body.sda .tool p{font-size:15px}
+    body.sda .tool .btn{margin-top:16px}
+  }
+}}
+/* recorrido (200vh, superpuesto 45vh con el siguiente): 0-33% entra · 33-50% fija · 52-66% se funde mientras entra el próximo */
+@keyframes visK {0%{opacity:0;transform:perspective(1600px) translate3d(0,120px,0) rotateX(26deg) rotateY(14deg) scale(.74)}
+  33%,50%{opacity:1;transform:perspective(1600px) translate3d(0,0,0) rotateX(0) rotateY(0) scale(1)}
+  66%,100%{opacity:0;transform:perspective(1600px) translate3d(0,-80px,0) rotateX(-8deg) scale(.9)}}
+@keyframes visKi{0%{opacity:0;transform:perspective(1600px) translate3d(0,120px,0) rotateX(26deg) rotateY(-14deg) scale(.74)}
+  33%,50%{opacity:1;transform:perspective(1600px) translate3d(0,0,0) rotateX(0) rotateY(0) scale(1)}
+  66%,100%{opacity:0;transform:perspective(1600px) translate3d(0,-80px,0) rotateX(-8deg) scale(.9)}}
+@keyframes visKlast {0%{opacity:0;transform:perspective(1600px) translate3d(0,120px,0) rotateX(26deg) rotateY(14deg) scale(.74)}33%,100%{opacity:1;transform:none}}
+@keyframes visKlasti{0%{opacity:0;transform:perspective(1600px) translate3d(0,120px,0) rotateX(26deg) rotateY(-14deg) scale(.74)}33%,100%{opacity:1;transform:none}}
+@keyframes txtK {0%,12%{opacity:0;transform:translate3d(-60px,0,0)}34%,49%{opacity:1;transform:none}60%,100%{opacity:0;transform:translate3d(0,-40px,0)}}
+@keyframes txtKi{0%,12%{opacity:0;transform:translate3d(60px,0,0)}34%,49%{opacity:1;transform:none}60%,100%{opacity:0;transform:translate3d(0,-40px,0)}}
+@keyframes txtKlast {0%,12%{opacity:0;transform:translate3d(-60px,0,0)}34%,100%{opacity:1;transform:none}}
+@keyframes txtKlasti{0%,12%{opacity:0;transform:translate3d(60px,0,0)}34%,100%{opacity:1;transform:none}}
+@keyframes haloK{0%{opacity:0}33%,50%{opacity:1}66%,100%{opacity:0}}
+@keyframes heroK{to{transform:scale(.82) translateY(-40px);opacity:.12}}
+@keyframes orbK{to{transform:translate(-8vw,10vh) scale(1.4)}}
+
+/* B) Resto de navegadores: cada indicador aparece con una animación por tiempo */
+body.rev .vwrap{opacity:0;transform:perspective(1400px) translate3d(0,70px,0) rotateX(20deg) scale(.88);
+  transition:transform 1.2s cubic-bezier(.16,1,.3,1) .1s,opacity .8s ease .1s}
+body.rev .k2,body.rev .k3,body.rev .k4,body.rev .k5{opacity:0;transform:translate3d(0,24px,0);transition:transform .95s cubic-bezier(.16,1,.3,1),opacity .7s ease}
+body.rev .k3{transition-delay:.07s}body.rev .k4{transition-delay:.14s}body.rev .k5{transition-delay:.2s}
+body.rev .tool.vivo .vwrap,body.rev .tool.vivo .k2,body.rev .tool.vivo .k3,body.rev .tool.vivo .k4,body.rev .tool.vivo .k5{opacity:1;transform:none}
 
 /* animaciones de dibujo */
 .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.8s cubic-bezier(.65,0,.35,1)}
@@ -139,27 +181,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
   .pre{opacity:1;transform:none}.draw{stroke-dashoffset:0}.bar{transform:none}.lvl{opacity:1;transform:none}.fade{opacity:1}.pop{transform:none}
   .hero{height:auto}.hero-stick{position:relative;height:auto;min-height:88vh}
 }
-body.cine .k2,body.cine .k3,body.cine .k4,body.cine .k5{transition:none}
-body.cine .btn.k5{transition:background .2s}
-
-/* ===== CELULAR: animaciones por tiempo en el compositor (fluidas a 60/120 Hz) ===== */
-body.movil .tool{min-height:auto;padding:76px 20px}
-body.movil .vwrap{opacity:0;transform:perspective(1200px) translate3d(0,64px,0) rotateX(20deg) scale(.88);
-  transition:transform 1.15s cubic-bezier(.16,1,.3,1) .12s,opacity .8s ease .12s;will-change:transform,opacity;backface-visibility:hidden}
-body.movil .k2,body.movil .k3,body.movil .k4,body.movil .k5{opacity:0;transform:translate3d(0,22px,0);
-  transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .7s ease;will-change:transform,opacity}
-body.movil .k3{transition-delay:.07s}body.movil .k4{transition-delay:.14s}body.movil .k5{transition-delay:.2s}
-body.movil .tool.vivo .vwrap,body.movil .tool.vivo .k2,body.movil .tool.vivo .k3,body.movil .tool.vivo .k4,body.movil .tool.vivo .k5{opacity:1;transform:none}
-body.movil .vis{box-shadow:0 18px 40px -22px rgba(14,27,43,.28)}
-body.movil .vis::after{display:none}
-body.movil .rail{display:flex;position:fixed;right:6px;top:50%;transform:translateY(-50%);flex-direction:column;gap:14px;z-index:40;
-  padding:10px 7px;border-radius:999px;background:rgba(251,251,253,.9);box-shadow:0 0 0 1px rgba(14,27,43,.06);opacity:0;transition:opacity .4s;pointer-events:none}
-body.movil .rail.on{opacity:1;pointer-events:auto}
-body.movil .rail .pill{left:7px;top:10px;transition:transform .55s cubic-bezier(.16,1,.3,1)}
-
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-stopped{overflow:hidden}
+.btn.k5{transition:background .2s}
 </style>
 </head>
 <body>
@@ -188,7 +210,6 @@ html.lenis,html.lenis body{height:auto}
 
 <footer>KPI RRHH 333 · Los indicadores conectados a SharePoint piden iniciar sesión con la cuenta de 333.</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 (function(){
 const POR_DEFECTO=[
@@ -320,7 +341,7 @@ function pintar(lista){
 let io;
 function animar(){
   if(io) io.disconnect();
-  if(!reduce){ modo(); bindTilt(); return; }
+  if(!reduce&&("IntersectionObserver" in window)){ modo(); bindTilt(); return; }
   const els=[...document.querySelectorAll(".rv, .tool")];
   if(reduce||!("IntersectionObserver" in window)){ els.forEach(e=>e.classList.add("in")); return; }
   io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("pre"); e.target.classList.add("in"); io.unobserve(e.target);} }),{threshold:.18});
@@ -339,110 +360,37 @@ function bindTilt(){
 }
 
 
-/* ===== ESCENAS: cada indicador entra, se sostiene y sale con el scroll ===== */
-const cineMQ=matchMedia("(hover: hover) and (pointer: fine)");
-const cl=(x)=>Math.min(1,Math.max(0,x));
-const ez=(x)=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
-function cineOn(){ return !reduce && cineMQ.matches; }
-let lenis=null, C=[], pillY=null, pillT=0, pillRun=false, ultT=0;
-function initLenis(){
-  if(reduce||lenis||!window.Lenis) return;
-  lenis=new Lenis({duration:1.25,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),smoothWheel:true,wheelMultiplier:.9,touchMultiplier:1.4});
-  const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)}; requestAnimationFrame(raf);
-  lenis.on("scroll",()=>{escenas();onScroll();});
-}
-function medir(){
-  const tools=[...document.querySelectorAll(".tool")];
-  C=tools.map((t,i)=>({t,v:t.querySelector(".vwrap"),halo:t.querySelector(".halo"),
-    ks:["k2","k3","k4","k5"].map(k=>t.querySelector("."+k)).filter(Boolean),
-    top:t.getBoundingClientRect().top+scrollY,h:t.offsetHeight,izq:i%2===0,last:i===tools.length-1}));
-}
-function pintarEscena(o,a,p){
-  const ent=ez(cl((a-.12)/1.0)), ext=o.last?0:ez(cl((p-.86)/.14))*.55;
-  const s=.72+.28*ent-.1*ext, rx=26*(1-ent), ry=(o.izq?-14:14)*(1-ent);
-  o.v.style.transform=`perspective(1600px) translate3d(0,${(110*(1-ent)-60*ext).toFixed(2)}px,0) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) scale(${s.toFixed(4)})`;
-  o.v.style.opacity=(Math.min(1,ent*1.4)*(1-ext)).toFixed(3);
-  o.ks.forEach((e,j)=>{ const q=ez(cl((a-.35-j*.07)/.8));
-    e.style.transform=`translate3d(${((o.izq?60:-60)*(1-q)).toFixed(2)}px,${(-36*ext).toFixed(2)}px,0)`;
-    e.style.opacity=(q*(1-ext)).toFixed(3); });
-  if(o.halo) o.halo.style.opacity=(ent*(1-ext)).toFixed(3);
-  if(a>.75&&!o.t.classList.contains("in")) o.t.classList.add("in");
-}
-function escenas(){
-  if(!document.body.classList.contains("cine")||!C.length) return;
-  const y=lenis?lenis.scroll:scrollY, vh=innerHeight; let f=-1;
-  C.forEach((o,i)=>{
-    const rt=o.top-y, total=Math.max(1,o.h-vh);
-    if(rt>vh*1.3||rt+o.h<-vh*.3) return;
-    const p=cl(-rt/total), a=(vh-rt)/vh;
-    pintarEscena(o,a,p);
-    if(a>=.5&&rt+o.h>vh*.5) f=i+(o.last?0:ez(cl((p-.8)/.2))*.999);
-  });
-  const rail=document.getElementById("rail"); rail.classList.toggle("on",f>=0);
-  if(f>=0){ pillT=Math.min(f,C.length-1)*22; if(pillY===null) pillY=pillT;
-    const act=Math.round(Math.min(f,C.length-1)); rail.querySelectorAll("a").forEach(a=>a.classList.toggle("act",+a.dataset.i===act));
-    if(!pillRun){pillRun=true;ultT=performance.now();requestAnimationFrame(pildora);} }
-}
-function pildora(now){
-  const pill=document.querySelector("#rail .pill"); if(!pill){pillRun=false;return;}
-  const dt=Math.min(64,now-ultT); ultT=now;
-  const k=1-Math.exp(-dt/90);               // suavizado independiente de los fps
-  const d=pillT-pillY; pillY+=d*k;
-  const estira=1+Math.min(1,Math.abs(d)/12)*.9;
-  pill.style.transform=`translate3d(0,${(pillY-7).toFixed(2)}px,0) scaleY(${estira.toFixed(3)})`;
-  if(Math.abs(d)>.05) requestAnimationFrame(pildora); else {pill.style.transform=`translate3d(0,${(pillT-7).toFixed(2)}px,0)`;pillRun=false;}
-}
-let ioM=null, railRaf=0;
+/* ===== ESCENAS: las anima el navegador (CSS); el JS solo observa qué indicador se ve ===== */
+const SDA=!!(window.CSS&&CSS.supports&&CSS.supports("animation-timeline: view()"));
+let ioV=null, ioR=null;
 function modo(){
-  const on=cineOn(), mov=!reduce&&!on;
-  document.body.classList.toggle("cine",on); document.body.classList.toggle("movil",mov);
-  document.querySelectorAll(".tool").forEach(t=>{
-    t.querySelectorAll(".vwrap,.k2,.k3,.k4,.k5").forEach(e=>{e.style.transform="";e.style.opacity="";});
-    if(on||mov){ t.querySelectorAll(".rv").forEach(e=>e.classList.remove("pre")); }
-  });
-  if(on){ initLenis(); medir(); escenas(); }
-  if(mov) movil();
+  document.body.classList.toggle("sda",SDA); document.body.classList.toggle("rev",!SDA);
+  const tools=[...document.querySelectorAll(".tool")];
+  tools.forEach(t=>t.querySelectorAll(".rv").forEach(e=>e.classList.remove("pre")));
+  if(ioV) ioV.disconnect(); if(ioR) ioR.disconnect();
+  // visibilidad: arranca dibujos del SVG, pausa animaciones fuera de pantalla y (sin SDA) dispara la entrada
+  ioV=new IntersectionObserver(es=>es.forEach(e=>{
+    e.target.classList.toggle("visible",e.isIntersecting);
+    if(e.isIntersecting&&e.intersectionRatio>.2){ e.target.classList.add("in","vivo"); }
+  }),{threshold:[0,.2,.4]});
+  // puntito activo: el indicador que ocupa el centro de la pantalla
+  ioR=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) activar(+e.target.dataset.i); }),{rootMargin:"-49% 0px -49% 0px"});
+  tools.forEach(t=>{ioV.observe(t);ioR.observe(t);});
+  const tope=document.getElementById("tools");
+  new IntersectionObserver(es=>es.forEach(e=>document.getElementById("rail").classList.toggle("on",e.isIntersecting)),{rootMargin:"-45% 0px -45% 0px"}).observe(tope);
 }
-function movil(){
-  if(ioM) ioM.disconnect();
-  ioM=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("vivo","in"); ioM.unobserve(e.target);} }),{threshold:.22,rootMargin:"0px 0px -8% 0px"});
-  document.querySelectorAll(".tool").forEach(t=>ioM.observe(t));
-  railMovil();
+function activar(i){
+  const rail=document.getElementById("rail"), pill=rail.querySelector(".pill"); if(!pill) return;
+  pill.style.transform=`translate3d(0,${i*22}px,0)`;
+  rail.querySelectorAll("a").forEach(a=>a.classList.toggle("act",+a.dataset.i===i));
 }
-function railMovil(){
-  railRaf=0; if(!document.body.classList.contains("movil")) return;
-  const tools=[...document.querySelectorAll(".tool")], vh=innerHeight, rail=document.getElementById("rail"), pill=rail.querySelector(".pill");
-  let act=-1; tools.forEach((t,i)=>{ const r=t.getBoundingClientRect(); if(r.top<vh*.55&&r.bottom>vh*.45) act=i; });
-  if(act<0&&tools[0]&&tools[0].getBoundingClientRect().top<vh*.55) act=tools.length-1;
-  rail.classList.toggle("on",act>=0);
-  if(act>=0&&pill){ pill.style.transform=`translate3d(0,${act*22-7}px,0)`; rail.querySelectorAll("a").forEach(a=>a.classList.toggle("act",+a.dataset.i===act)); }
-}
-addEventListener("scroll",()=>{ if(document.body.classList.contains("movil")&&!railRaf) railRaf=requestAnimationFrame(railMovil); },{passive:true});
-function irA(y){ lenis?lenis.scrollTo(y,{duration:1.6}):scrollTo({top:y,behavior:"smooth"}); }
-addEventListener("scroll",()=>{ if(!lenis) requestAnimationFrame(escenas); },{passive:true});
-addEventListener("resize",()=>requestAnimationFrame(modo));
-addEventListener("load",()=>{medir();escenas();});
-document.fonts&&document.fonts.ready.then(()=>{medir();escenas();});
 document.addEventListener("click",e=>{
-  const a=e.target.closest(".rail a, a[href^='#']"); if(!a) return;
-  if(document.body.classList.contains("movil")&&a.closest(".rail")){ const t=document.querySelectorAll(".tool")[+a.dataset.i]; if(t){ e.preventDefault(); t.scrollIntoView({behavior:"smooth",block:"start"}); } return; }
-  if(!document.body.classList.contains("cine")) return;
-  let y=null;
-  if(a.closest(".rail")){ const o=C[+a.dataset.i]; if(o) y=o.top+(o.h-innerHeight)*.35; }
-  else { const el=document.querySelector(a.getAttribute("href")); if(el){ const o=C.find(c=>c.t===el); y=o?o.top+(o.h-innerHeight)*.35:el.getBoundingClientRect().top+scrollY; } }
-  if(y!==null){ e.preventDefault(); irA(y); }
+  const a=e.target.closest(".rail a"); if(!a) return;
+  const t=document.querySelectorAll(".tool")[+a.dataset.i]; if(!t) return;
+  e.preventDefault();
+  const y=t.getBoundingClientRect().top+scrollY+(SDA?(t.offsetHeight+innerHeight)*.42-innerHeight:-40);
+  scrollTo({top:y,behavior:"smooth"});
 });
-
-/* hero: se achica y se desvanece al scrollear, estilo keynote */
-const hero=document.getElementById("hero"), ht=document.getElementById("heroTxt"), orb=document.getElementById("orb");
-function onScroll(){
-  if(reduce||document.body.classList.contains("movil")) return;
-  const p=Math.min(1,Math.max(0,scrollY/(hero.offsetHeight-innerHeight)));
-  ht.style.transform=`scale(${1-p*.18}) translateY(${-p*40}px)`;
-  ht.style.opacity=String(1-p*0.85);
-  orb.style.transform=`translate(${p*-8}vw,${p*10}vh) scale(${1+p*.4})`;
-}
-addEventListener("scroll",()=>requestAnimationFrame(onScroll),{passive:true});
 
 pintar(POR_DEFECTO);
 (async()=>{ for(const u of FUENTES){ try{

@@ -73,8 +73,22 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
 @media (max-width:420px){.kpis{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
+<style id="volver-css">
+.volver{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;
+  display:inline-flex;align-items:center;gap:8px;padding:10px 16px 10px 12px;border-radius:999px;
+  font:600 13px/1 "Montserrat",system-ui,Arial,sans-serif;color:#fff;background:#1F6DB1;text-decoration:none;
+  box-shadow:0 10px 24px -10px rgba(14,27,43,.45);transition:transform .25s cubic-bezier(.2,.8,.2,1),background .2s;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.volver svg{width:16px;height:16px}
+@media (hover:hover){.volver:hover{background:#185a93;transform:translateX(-2px)}}
+.volver:focus-visible{outline:2px solid #E87722;outline-offset:3px}
+@media print{.volver{display:none}}
+</style>
 </head>
 <body>
+<a class="volver" href="./" id="volver" aria-label="Volver a los indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Indicadores</a>
+<script>document.getElementById("volver").addEventListener("click",function(e){try{var r=document.referrer&&new URL(document.referrer);if(r&&r.origin===location.origin&&history.length>1){e.preventDefault();history.back();}}catch(_){}});</script>
+
 <div class="wrap">
   <header class="top">
     <div class="brand">
