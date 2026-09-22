@@ -141,6 +141,22 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
 }
 body.cine .k2,body.cine .k3,body.cine .k4,body.cine .k5{transition:none}
 body.cine .btn.k5{transition:background .2s}
+
+/* ===== CELULAR: animaciones por tiempo en el compositor (fluidas a 60/120 Hz) ===== */
+body.movil .tool{min-height:auto;padding:76px 20px}
+body.movil .vwrap{opacity:0;transform:perspective(1200px) translate3d(0,64px,0) rotateX(20deg) scale(.88);
+  transition:transform 1.15s cubic-bezier(.16,1,.3,1) .12s,opacity .8s ease .12s;will-change:transform,opacity;backface-visibility:hidden}
+body.movil .k2,body.movil .k3,body.movil .k4,body.movil .k5{opacity:0;transform:translate3d(0,22px,0);
+  transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .7s ease;will-change:transform,opacity}
+body.movil .k3{transition-delay:.07s}body.movil .k4{transition-delay:.14s}body.movil .k5{transition-delay:.2s}
+body.movil .tool.vivo .vwrap,body.movil .tool.vivo .k2,body.movil .tool.vivo .k3,body.movil .tool.vivo .k4,body.movil .tool.vivo .k5{opacity:1;transform:none}
+body.movil .vis{box-shadow:0 18px 40px -22px rgba(14,27,43,.28)}
+body.movil .vis::after{display:none}
+body.movil .rail{display:flex;position:fixed;right:6px;top:50%;transform:translateY(-50%);flex-direction:column;gap:14px;z-index:40;
+  padding:10px 7px;border-radius:999px;background:rgba(251,251,253,.9);box-shadow:0 0 0 1px rgba(14,27,43,.06);opacity:0;transition:opacity .4s;pointer-events:none}
+body.movil .rail.on{opacity:1;pointer-events:auto}
+body.movil .rail .pill{left:7px;top:10px;transition:transform .55s cubic-bezier(.16,1,.3,1)}
+
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 .lenis.lenis-stopped{overflow:hidden}
@@ -304,7 +320,7 @@ function pintar(lista){
 let io;
 function animar(){
   if(io) io.disconnect();
-  if(cineOn()){ modo(); bindTilt(); return; }
+  if(!reduce){ modo(); bindTilt(); return; }
   const els=[...document.querySelectorAll(".rv, .tool")];
   if(reduce||!("IntersectionObserver" in window)){ els.forEach(e=>e.classList.add("in")); return; }
   io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("pre"); e.target.classList.add("in"); io.unobserve(e.target);} }),{threshold:.18});
@@ -324,7 +340,7 @@ function bindTilt(){
 
 
 /* ===== ESCENAS: cada indicador entra, se sostiene y sale con el scroll ===== */
-const cineMQ=matchMedia("(min-width: 0px)");
+const cineMQ=matchMedia("(hover: hover) and (pointer: fine)");
 const cl=(x)=>Math.min(1,Math.max(0,x));
 const ez=(x)=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 function cineOn(){ return !reduce && cineMQ.matches; }
@@ -376,22 +392,41 @@ function pildora(now){
   pill.style.transform=`translate3d(0,${(pillY-7).toFixed(2)}px,0) scaleY(${estira.toFixed(3)})`;
   if(Math.abs(d)>.05) requestAnimationFrame(pildora); else {pill.style.transform=`translate3d(0,${(pillT-7).toFixed(2)}px,0)`;pillRun=false;}
 }
+let ioM=null, railRaf=0;
 function modo(){
-  const on=cineOn(); document.body.classList.toggle("cine",on);
+  const on=cineOn(), mov=!reduce&&!on;
+  document.body.classList.toggle("cine",on); document.body.classList.toggle("movil",mov);
   document.querySelectorAll(".tool").forEach(t=>{
     t.querySelectorAll(".vwrap,.k2,.k3,.k4,.k5").forEach(e=>{e.style.transform="";e.style.opacity="";});
-    if(on){ t.querySelectorAll(".rv").forEach(e=>e.classList.remove("pre")); }
+    if(on||mov){ t.querySelectorAll(".rv").forEach(e=>e.classList.remove("pre")); }
   });
-  if(on){ initLenis(); medir(); }
-  escenas();
+  if(on){ initLenis(); medir(); escenas(); }
+  if(mov) movil();
 }
+function movil(){
+  if(ioM) ioM.disconnect();
+  ioM=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("vivo","in"); ioM.unobserve(e.target);} }),{threshold:.22,rootMargin:"0px 0px -8% 0px"});
+  document.querySelectorAll(".tool").forEach(t=>ioM.observe(t));
+  railMovil();
+}
+function railMovil(){
+  railRaf=0; if(!document.body.classList.contains("movil")) return;
+  const tools=[...document.querySelectorAll(".tool")], vh=innerHeight, rail=document.getElementById("rail"), pill=rail.querySelector(".pill");
+  let act=-1; tools.forEach((t,i)=>{ const r=t.getBoundingClientRect(); if(r.top<vh*.55&&r.bottom>vh*.45) act=i; });
+  if(act<0&&tools[0]&&tools[0].getBoundingClientRect().top<vh*.55) act=tools.length-1;
+  rail.classList.toggle("on",act>=0);
+  if(act>=0&&pill){ pill.style.transform=`translate3d(0,${act*22-7}px,0)`; rail.querySelectorAll("a").forEach(a=>a.classList.toggle("act",+a.dataset.i===act)); }
+}
+addEventListener("scroll",()=>{ if(document.body.classList.contains("movil")&&!railRaf) railRaf=requestAnimationFrame(railMovil); },{passive:true});
 function irA(y){ lenis?lenis.scrollTo(y,{duration:1.6}):scrollTo({top:y,behavior:"smooth"}); }
 addEventListener("scroll",()=>{ if(!lenis) requestAnimationFrame(escenas); },{passive:true});
 addEventListener("resize",()=>requestAnimationFrame(modo));
 addEventListener("load",()=>{medir();escenas();});
 document.fonts&&document.fonts.ready.then(()=>{medir();escenas();});
 document.addEventListener("click",e=>{
-  const a=e.target.closest(".rail a, a[href^='#']"); if(!a||!document.body.classList.contains("cine")) return;
+  const a=e.target.closest(".rail a, a[href^='#']"); if(!a) return;
+  if(document.body.classList.contains("movil")&&a.closest(".rail")){ const t=document.querySelectorAll(".tool")[+a.dataset.i]; if(t){ e.preventDefault(); t.scrollIntoView({behavior:"smooth",block:"start"}); } return; }
+  if(!document.body.classList.contains("cine")) return;
   let y=null;
   if(a.closest(".rail")){ const o=C[+a.dataset.i]; if(o) y=o.top+(o.h-innerHeight)*.35; }
   else { const el=document.querySelector(a.getAttribute("href")); if(el){ const o=C.find(c=>c.t===el); y=o?o.top+(o.h-innerHeight)*.35:el.getBoundingClientRect().top+scrollY; } }
@@ -401,7 +436,7 @@ document.addEventListener("click",e=>{
 /* hero: se achica y se desvanece al scrollear, estilo keynote */
 const hero=document.getElementById("hero"), ht=document.getElementById("heroTxt"), orb=document.getElementById("orb");
 function onScroll(){
-  if(reduce) return;
+  if(reduce||document.body.classList.contains("movil")) return;
   const p=Math.min(1,Math.max(0,scrollY/(hero.offsetHeight-innerHeight)));
   ht.style.transform=`scale(${1-p*.18}) translateY(${-p*40}px)`;
   ht.style.opacity=String(1-p*0.85);
