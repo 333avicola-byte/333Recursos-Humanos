@@ -14,6 +14,7 @@ tocar nada más.
 | Tablero RPE | rpe.html | Revenue per Employee: cuánto aporta cada FTE a la facturación mensual. | Excel "RPE KPI" · SharePoint |
 | Índice de rotación | rotacion.html | Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada. | Excel "Rotacion 333" · SharePoint |
 | Pirámide de jerarquías | piramide.html | Los cinco niveles de responsabilidad y las posiciones típicas de cada uno. | Contenido fijo en el archivo |
+| Equipo con Futuro | teambuilding.html | Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación. | Excel "Equipo con Futuro 333" · SharePoint |
 
 Columnas: **Herramienta** es el título de la tarjeta, **Link** el archivo, **Descripción** el
 texto y **Datos** la etiqueta gris de abajo. El orden de las filas es el orden de las tarjetas.
@@ -23,6 +24,12 @@ texto y **Datos** la etiqueta gris de abajo. El orden de las filas es el orden d
 1. Cargar el mes en el Excel correspondiente, en SharePoint (333 Recruitment › GESTION INTERNA › KPI COSTOS).
 2. En "Rotacion 333", actualizar además el último mes cerrado en la hoja Parametros.
 3. Los tableros releen el Excel solos cada pocos minutos; no hay que tocar GitHub.
+
+## Actualización semestral (Equipo con Futuro)
+
+1. Exportar el resultado de Mentimeter y copiar la hoja "Voters" completa.
+2. Pegarla en A1 de la siguiente solapa "Ola" libre de "Equipo con Futuro 333" y completar nombre y sesión válida en la hoja Olas.
+3. El tablero la suma solo al histórico.
 
 ## Acceso
 

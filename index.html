@@ -134,7 +134,8 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
 const POR_DEFECTO=[
   {nombre:"Tablero RPE",link:"rpe.html",desc:"Revenue per Employee: cuánto aporta cada FTE a la facturación mensual.",fuente:"Excel RPE KPI · SharePoint"},
   {nombre:"Índice de rotación",link:"rotacion.html",desc:"Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada.",fuente:"Excel Rotacion 333 · SharePoint"},
-  {nombre:"Pirámide de jerarquías",link:"piramide.html",desc:"Los cinco niveles de responsabilidad y las posiciones típicas de cada uno.",fuente:"Contenido fijo"}
+  {nombre:"Pirámide de jerarquías",link:"piramide.html",desc:"Los cinco niveles de responsabilidad y las posiciones típicas de cada uno.",fuente:"Contenido fijo"},
+  {nombre:"Equipo con Futuro",link:"teambuilding.html",desc:"Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación.",fuente:"Excel Equipo con Futuro 333 · SharePoint"}
 ];
 const FUENTES=["https://raw.githubusercontent.com/333avicola-byte/333Recursos-Humanos/main/README.md","README.md"];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -208,6 +209,28 @@ function visual(h){
         <text x="200" y="${y+27}" text-anchor="middle" font-family="Montserrat, Helvetica, Arial, sans-serif" font-size="${[10,12,13,13,14][i]}" font-weight="800" fill="#fff" letter-spacing="1">${nombres[i]}</text></g>`; }
     return `<svg viewBox="0 0 400 400" role="img" aria-label="Ilustración pirámide">${defs}
       <ellipse cx="200" cy="352" rx="170" ry="16" fill="#0E1B2B" opacity=".07"/>${s}</svg>`;
+  }
+  if(k.includes("futuro")||k.includes("teambuilding")){
+    const filas=[["Visión",236,250],["Unidad",240,262],["Composición",214,206],["Compromiso",270,276]];
+    let b="";
+    filas.forEach(([n,a,c],i)=>{const y=132+i*50;
+      b+=`<g class="lvl" style="transition-delay:${i*140}ms">
+        <text x="68" y="${y+14}" font-family="Montserrat, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#53565A">${n}</text>
+        <rect x="150" y="${y}" width="${a-80}" height="11" rx="5.5" fill="#D1E3F6"/>
+        <rect x="150" y="${y+14}" width="${c-80}" height="11" rx="5.5" fill="${c<a?"#E87722":"#1F6DB1"}"/></g>`;});
+    return `<svg viewBox="0 0 400 400" role="img" aria-label="Ilustración Equipo con Futuro">${defs}
+      <rect x="40" y="70" width="320" height="270" rx="26" fill="#fff" filter="url(#sh)"/>
+      <text x="68" y="110" font-family="Montserrat, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#53565A" letter-spacing="1.5">EQUIPO CON FUTURO</text>
+      <line x1="${150+224-80}" y1="124" x2="${150+224-80}" y2="326" stroke="#E87722" stroke-width="2" stroke-dasharray="5 4"/>
+      ${b}
+      <g class="float" filter="url(#sh)"><rect x="236" y="36" width="140" height="52" rx="18" fill="#fff"/>
+        <rect x="254" y="52" width="10" height="20" rx="3" fill="#D1E3F6"/><rect x="268" y="46" width="10" height="26" rx="3" fill="#1F6DB1"/>
+        <text x="288" y="68" font-family="Montserrat, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#0E1B2B">6 meses</text></g>
+      <g class="float d2" filter="url(#sh)"><rect x="18" y="312" width="150" height="56" rx="18" fill="#1F6DB1"/>
+        <path d="M40 348 L54 334 L64 342 L80 326" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M72 326 L80 326 L80 334" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="92" y="346" font-family="Montserrat, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fff">histórico</text></g>
+    </svg>`;
   }
   return `<svg viewBox="0 0 400 400">${defs}<rect x="60" y="60" width="280" height="280" rx="40" fill="#fff" filter="url(#sh)"/><circle class="draw" style="--len:380" cx="200" cy="200" r="70" fill="none" stroke="#1F6DB1" stroke-width="10" stroke-linecap="round"/></svg>`;
 }
