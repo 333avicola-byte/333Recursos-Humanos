@@ -66,8 +66,38 @@ nav{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center
 .pop{transform-box:fill-box;transform-origin:center;transform:scale(0);transition:transform .6s 1.6s cubic-bezier(.3,1.6,.5,1)}.in .pop{transform:scale(1)}
 .float{animation:flt 6s ease-in-out infinite}.float.d2{animation-delay:-3s}
 @keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@media (max-width:820px){.tool{min-height:auto;padding:88px 20px}.tool-in{grid-template-columns:1fr;gap:34px}.tool:nth-of-type(odd) .tool-in .vis{order:0}.vis{width:100%;max-width:460px;justify-self:center;border-radius:26px}.tool p{max-width:none}}
+@media (max-width:820px){.tool{min-height:auto;padding:88px 20px}.tool-in{grid-template-columns:1fr;gap:34px}.tool:nth-of-type(odd) .tool-in .vwrap{order:0}.vis{width:100%;border-radius:26px}.vwrap{max-width:460px;justify-self:center}.tool p{max-width:none}}
 @media (max-width:420px){.vis svg{width:96%}.tool h2{font-size:40px}}
+
+
+/* ===== ESCENAS tipo keynote para cada indicador ===== */
+.stage{width:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.vwrap{width:100%}
+.tool:nth-of-type(odd) .tool-in .vwrap{order:-1}
+.bignum{display:none}
+.rail{display:none}
+body.cine .tool{display:block;min-height:0;height:190vh;padding:0;background:transparent!important}
+body.cine .stage{position:sticky;top:52px;height:calc(100vh - 52px);overflow:hidden;padding:0 22px}
+body.cine .stage::before{content:"";position:absolute;inset:0;z-index:-2;opacity:var(--bgk,0);
+  background:radial-gradient(70% 60% at var(--bx,70%) 45%,#E4EFFA 0%,rgba(228,239,250,0) 70%)}
+body.cine .bignum{display:block;position:absolute;z-index:-1;top:50%;font-weight:800;font-size:min(46vw,620px);line-height:.8;letter-spacing:-.07em;
+  color:transparent;-webkit-text-stroke:2px rgba(31,109,177,.10);background:linear-gradient(180deg,rgba(31,109,177,.07),rgba(31,109,177,0));
+  -webkit-background-clip:text;background-clip:text;will-change:transform,opacity;pointer-events:none;user-select:none}
+body.cine .tool:nth-of-type(odd) .bignum{right:-2vw}
+body.cine .tool:nth-of-type(even) .bignum{left:-2vw}
+body.cine .vwrap,body.cine .k1,body.cine .k2,body.cine .k3,body.cine .k4,body.cine .k5{will-change:transform,opacity}
+body.cine .vis{box-shadow:0 50px 120px -40px rgba(14,27,43,.35)}
+body.cine .k5{display:inline-flex}
+body.cine .rail{display:flex;position:fixed;right:26px;top:50%;transform:translateY(-50%);flex-direction:column;gap:16px;z-index:40;
+  opacity:0;transition:opacity .5s;pointer-events:none}
+body.cine .rail.on{opacity:1;pointer-events:auto}
+.rail a{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.rail .dot{width:8px;height:8px;border-radius:50%;background:rgba(14,27,43,.2);transition:all .35s cubic-bezier(.2,.8,.2,1)}
+.rail .lbl{font-size:12px;font-weight:600;color:var(--ink);opacity:0;transform:translateX(8px);transition:all .35s;white-space:nowrap;
+  background:rgba(251,251,253,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:4px 10px;border-radius:999px}
+.rail a:hover .lbl,.rail a.act .lbl{opacity:1;transform:none}
+.rail a.act .dot{background:var(--azul);height:26px;border-radius:6px}
+.rail .bar-p{display:none}
 
 /* animaciones de dibujo */
 .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.8s cubic-bezier(.65,0,.35,1)}
@@ -117,7 +147,6 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
     <div id="heroTxt" style="display:flex;flex-direction:column;align-items:center">
       <div class="eyebrow">Recursos Humanos · 333</div>
       <h1>KPI RRHH<br><span>LATAM</span></h1>
-      <p>Los indicadores de RRHH de 333, vivos y en un solo lugar.</p>
       <div class="cta"><a class="btn pri" href="#tools">Ver indicadores</a></div>
     </div>
     <div class="scroll-cue">Deslizá</div>
@@ -125,6 +154,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;background:var(--tile);padd
 </header>
 
 <main id="tools"></main>
+<nav class="rail" id="rail" aria-label="Indicadores"></nav>
 
 
 <footer>KPI RRHH 333 · Los indicadores conectados a SharePoint piden iniciar sesión con la cuenta de 333.</footer>
@@ -238,18 +268,21 @@ function visual(h){
 function pintar(lista){
   document.getElementById("navlinks").innerHTML=lista.map(h=>`<a href="${esc(h.link)}">${esc(h.nombre)}</a>`).join("");
   document.getElementById("tools").innerHTML=lista.map((h,i)=>`
-    <section class="tool">
-      <div class="tool-in">
-        <div class="txt rv">
-          <div class="num">Indicador ${String(i+1).padStart(2,"0")}</div>
-          <h2>${esc(h.nombre)}</h2>
-          ${h.desc?`<p>${esc(h.desc)}</p>`:""}
-          ${h.fuente?`<div class="src">${esc(h.fuente)}</div>`:""}
-          <a class="btn pri" href="${esc(h.link)}">Abrir ›</a>
+    <section class="tool" data-i="${i}" id="ind-${i+1}">
+      <div class="stage">
+        <div class="tool-in">
+          <div class="txt rv">
+            <div class="num k1">Indicador ${String(i+1).padStart(2,"0")}</div>
+            <h2 class="k2">${esc(h.nombre)}</h2>
+            ${h.desc?`<p class="k3">${esc(h.desc)}</p>`:""}
+            ${h.fuente?`<div class="src k4">${esc(h.fuente)}</div>`:""}
+            <a class="btn pri k5" href="${esc(h.link)}">Abrir ›</a>
+          </div>
+          <div class="vwrap"><a class="vis" href="${esc(h.link)}" aria-label="Abrir ${esc(h.nombre)}">${visual(h)}</a></div>
         </div>
-        <a class="vis" href="${esc(h.link)}" aria-label="Abrir ${esc(h.nombre)}">${visual(h)}</a>
       </div>
     </section>`).join("");
+  document.getElementById("rail").innerHTML=lista.map((h,i)=>`<a href="#ind-${i+1}" data-i="${i}" aria-label="${esc(h.nombre)}"><span class="dot"></span></a>`).join("");
   animar();
 }
 
@@ -257,6 +290,7 @@ function pintar(lista){
 let io;
 function animar(){
   if(io) io.disconnect();
+  if(cineOn()){ modo(); bindTilt(); return; }
   const els=[...document.querySelectorAll(".rv, .tool")];
   if(reduce||!("IntersectionObserver" in window)){ els.forEach(e=>e.classList.add("in")); return; }
   io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.remove("pre"); e.target.classList.add("in"); io.unobserve(e.target);} }),{threshold:.18});
@@ -264,13 +298,63 @@ function animar(){
     if(r.top<innerHeight*.9){ e.classList.add("in"); return; }
     if(e.classList.contains("rv")) e.classList.add("pre");
     io.observe(e); });
-  /* inclinación 3D suave en los visuales */
+  bindTilt();
+}
+function bindTilt(){
   document.querySelectorAll(".vis").forEach(v=>{
     v.addEventListener("pointermove",ev=>{ const r=v.getBoundingClientRect(), x=(ev.clientX-r.left)/r.width-.5, y=(ev.clientY-r.top)/r.height-.5;
       v.style.transform=`perspective(900px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`; });
     v.addEventListener("pointerleave",()=>{ v.style.transform=""; });
   });
 }
+
+
+/* ===== ESCENAS: cada indicador entra, se sostiene y sale con el scroll ===== */
+const cineMQ=matchMedia("(min-width: 900px)");
+const cl=(x)=>Math.min(1,Math.max(0,x));
+const ez=(x)=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function cineOn(){ return !reduce && cineMQ.matches; }
+function escenas(){
+  if(!document.body.classList.contains("cine")) return;
+  const tools=[...document.querySelectorAll(".tool")], vh=innerHeight;
+  let act=-1, best=0;
+  tools.forEach((t,i)=>{
+    const r=t.getBoundingClientRect(), total=r.height-vh;
+    if(r.bottom<-vh*.2||r.top>vh*1.2) return;
+    const p=cl(-r.top/total), last=i===tools.length-1, a=(vh-r.top)/vh;
+    const ent=ez(cl((a-.12)/1.0)), ext=last?0:ez(cl((p-.86)/.14))*.55;
+    const izq=t.matches(":nth-of-type(odd)");      // visual a la izquierda
+    const v=t.querySelector(".vwrap");
+    const s=.72+.28*ent-.1*ext, rx=26*(1-ent), ry=(izq?-14:14)*(1-ent);
+    v.style.transform=`perspective(1600px) translate3d(0,${(110*(1-ent)-60*ext).toFixed(1)}px,0) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${s.toFixed(4)})`;
+    v.style.opacity=(Math.min(1,ent*1.4)*(1-ext)).toFixed(3);
+    ["k1","k2","k3","k4","k5"].forEach((k,j)=>{
+      const e=t.querySelector("."+k); if(!e) return;
+      const q=ez(cl((a-.35-j*.07)/.8));
+      e.style.transform=`translate3d(${((izq?60:-60)*(1-q)).toFixed(1)}px,${(-36*ext).toFixed(1)}px,0)`;
+      e.style.opacity=(q*(1-ext)).toFixed(3);
+    });
+    t.querySelector(".stage").style.setProperty("--bgk",(ent*(1-ext)).toFixed(3));
+    t.querySelector(".stage").style.setProperty("--bx",izq?"28%":"72%");
+    if(a>.75) t.classList.add("in");
+    const vis=1-Math.abs(p-.5)*2; if(p>0&&p<1&&vis>best){best=vis;act=i;}
+  });
+  const rail=document.getElementById("rail");
+  const primero=tools[0]&&tools[0].getBoundingClientRect().top<vh*.6;
+  rail.classList.toggle("on",!!primero&&act>-1);
+  rail.querySelectorAll("a").forEach(a=>a.classList.toggle("act",+a.dataset.i===act));
+}
+function modo(){
+  const on=cineOn(); document.body.classList.toggle("cine",on);
+  document.querySelectorAll(".tool").forEach(t=>{
+    t.querySelectorAll(".vwrap,.k1,.k2,.k3,.k4,.k5").forEach(e=>{e.style.transform="";e.style.opacity="";});
+    if(on){ t.querySelectorAll(".rv").forEach(e=>e.classList.remove("pre")); }
+  });
+  escenas();
+}
+addEventListener("scroll",()=>requestAnimationFrame(escenas),{passive:true});
+addEventListener("resize",()=>requestAnimationFrame(modo));
+cineMQ.addEventListener&&cineMQ.addEventListener("change",modo);
 
 /* hero: se achica y se desvanece al scrollear, estilo keynote */
 const hero=document.getElementById("hero"), ht=document.getElementById("heroTxt"), orb=document.getElementById("orb");
