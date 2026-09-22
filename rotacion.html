@@ -84,25 +84,12 @@ details{margin-top:8px} summary{cursor:pointer;font:600 13px var(--display);colo
 .muted{color:var(--muted)}
 .years{display:flex;gap:8px;flex-wrap:wrap}
 .years button{border-radius:999px;padding:8px 16px;font-weight:600}
+.years.fil button{font-weight:500;padding:6px 14px}
 .years button[aria-pressed="true"]{background:var(--azul);color:#fff;border-color:var(--azul)}
 tr.sel td{background:#EEF5FC;font-weight:600}
 </style>
-<style id="volver-css">
-.volver{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;
-  display:inline-flex;align-items:center;gap:8px;padding:10px 16px 10px 12px;border-radius:999px;
-  font:600 13px/1 "Montserrat",system-ui,Arial,sans-serif;color:#fff;background:#1F6DB1;text-decoration:none;
-  box-shadow:0 10px 24px -10px rgba(14,27,43,.45);transition:transform .25s cubic-bezier(.2,.8,.2,1),background .2s;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.volver svg{width:16px;height:16px}
-@media (hover:hover){.volver:hover{background:#185a93;transform:translateX(-2px)}}
-.volver:focus-visible{outline:2px solid #E87722;outline-offset:3px}
-@media print{.volver{display:none}}
-</style>
 </head>
 <body>
-<a class="volver" href="./" id="volver" aria-label="Volver a los indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Indicadores</a>
-<script>document.getElementById("volver").addEventListener("click",function(e){try{var r=document.referrer&&new URL(document.referrer);if(r&&r.origin===location.origin&&history.length>1){e.preventDefault();history.back();}}catch(_){}});</script>
-
 
 <div class="wrap">
   <header class="top">
@@ -129,6 +116,7 @@ tr.sel td{background:#EEF5FC;font-weight:600}
   </section>
 
   <nav class="years" id="years" aria-label="Elegir año"></nav>
+  <nav class="years fil" id="fils" aria-label="Elegir filial"></nav>
 
   <section class="kpis">
     <div class="kpi"><div class="eyebrow">Rotación voluntaria</div><div class="v" id="kVol">—</div><div class="s" id="kVolS"></div></div>
@@ -148,6 +136,16 @@ tr.sel td{background:#EEF5FC;font-weight:600}
       <p class="sub">Índice acumulado mes a mes: bajas hasta ese mes ÷ plantilla media hasta ese mes</p>
       <div class="chart"><canvas id="c2" aria-label="Índice acumulado por año"></canvas></div>
     </div>
+  </section>
+
+  <section class="panel">
+    <h2>Por filial</h2>
+    <p class="sub" id="filSub">Año seleccionado · cada filial con su propia dotación</p>
+    <div class="tablebox"><table>
+      <thead><tr><th>Filial</th><th>Dot. inicial</th><th>Altas</th><th>Bajas</th><th>Voluntarias</th><th>Tempranas</th><th>Dot. actual</th><th>Plantilla media</th><th>Índice</th><th>Anualizada</th></tr></thead>
+      <tbody id="tbFil"><tr><td colspan="10" class="muted">Sin datos todavía</td></tr></tbody>
+    </table></div>
+    <p class="sub" style="margin-top:10px">Filiales con plantilla media menor al umbral de Parametros no muestran porcentaje: una sola baja distorsiona el índice.</p>
   </section>
 
   <section class="panel">
@@ -189,7 +187,7 @@ const pf=n=>n==null||isNaN(n)?"—":(n*100).toLocaleString("es-AR",{minimumFract
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const serial=v=>typeof v==="number"&&v>20000&&v<80000?new Date(Date.UTC(1899,11,30)+v*86400000):null;
 const dmy=d=>d?String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0")+"/"+d.getUTCFullYear():"";
-let chart, chart2, pca=null, account=null, timer=null, P=null, MOVS=[], SEL=null;
+let chart, chart2, pca=null, account=null, timer=null, P=null, MOVS=[], SEL=null, SELF="Todas";
 const COLORES=["#1F6DB1","#E87722","#8CC63F","#53565A","#2D85D1","#F5A35C"];
 function mostrar(){
   const anios=aniosDisponibles(P), res={};
@@ -197,7 +195,17 @@ function mostrar(){
   const ys=Object.keys(res).map(Number);
   $("years").innerHTML=ys.map(y=>`<button type="button" aria-pressed="${y===SEL}" data-y="${y}">${y}${y===P.actual&&P.corte<12?" · en curso":""}</button>`).join("");
   $("years").querySelectorAll("button").forEach(b=>b.onclick=()=>{SEL=+b.dataset.y; mostrar();});
+  const filsAnio=[...new Set(P.filas.filter(f=>f.anio===SEL).map(f=>f.nombre))];
+  if(SELF!=="Todas"&&!filsAnio.includes(SELF)) SELF="Todas";
+  $("fils").innerHTML=["Todas",...filsAnio].map(n=>`<button type="button" aria-pressed="${n===SELF}" data-f="${n}">${n==="Todas"?"Todas las medidas":n}</button>`).join("");
+  $("fils").querySelectorAll("button").forEach(b=>b.onclick=()=>{SELF=b.dataset.f; mostrar();});
+  if(!res[SEL]){ $("heroTxt").textContent="Sin datos para esta selección."; return; }
   pintar(res[SEL]);
+  const prev=SELF; SELF="Todas"; const base=paramAnio(P,SEL); SELF=prev;
+  $("filSub").textContent=`${SEL}${base.corte<12?" · "+base.corte+" meses cerrados":""} · cada filial con su propia dotación`;
+  $("tbFil").innerHTML=base.filiales.map(f=>{const R=analizar({...base,filiales:[f]},MOVS);
+    const chica=R.media<P.umbral;
+    return `<tr class="${f.nombre===SELF?"sel":""}"><td>${f.nombre}</td><td>${R.inicial}</td><td>${R.totAltas}</td><td>${R.totBajas}</td><td>${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)}</td><td>${R.tempranas}</td><td>${R.dot[R.dot.length-1]??R.inicial}</td><td>${nf(R.media)}</td><td>${chica?'<span class="muted">chica</span>':pf(R.indice)}</td><td>${chica?"—":pf(R.anual)}</td></tr>`;}).join("")||'<tr><td colspan="10" class="muted">Sin filiales medidas</td></tr>';
   $("tbHist").innerHTML=ys.slice().reverse().map(y=>{const R=res[y]; return `<tr class="${y===SEL?"sel":""}"><td>${y}</td><td>${R.corte}</td><td>${R.inicial}</td><td>${R.totAltas}</td><td>${R.totBajas}</td><td>${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)}</td><td>${R.tempranas}</td><td>${nf(R.media)}</td><td>${pf(R.indice)}</td><td>${pf(R.iVol)}</td><td>${pf(R.anual)}</td></tr>`;}).join("");
   if(window.Chart){
     const ds=ys.map((y,i)=>({label:String(y),data:res[y].acum.map(v=>v==null?null:+(v*100).toFixed(2)),borderColor:COLORES[i%COLORES.length],backgroundColor:COLORES[i%COLORES.length],
@@ -271,7 +279,7 @@ function leerParametros(v){
 }
 function paramAnio(P,y){
   const corte=y<P.actual?12:(y===P.actual?P.corte:0);
-  return {anio:y,corte,umbral:P.umbral,filiales:P.filas.filter(f=>f.anio===y)};
+  return {anio:y,corte,umbral:P.umbral,filiales:P.filas.filter(f=>f.anio===y&&(SELF==="Todas"||f.nombre===SELF))};
 }
 function aniosDisponibles(P){ return [...new Set(P.filas.map(f=>f.anio))].filter(y=>y<=P.actual).sort((a,b)=>a-b); }
 function leerMovimientos(v){
