@@ -248,11 +248,14 @@ function analizar(param, movs){
 }
 
 function pintar(R){
-  $("heroVal").firstChild.nodeValue=pf(R.indice);
+  const chica=R.media<P.umbral;
+  $("heroVal").firstChild.nodeValue=chica?"—":pf(R.indice);
   $("heroEye").textContent=`Índice de rotación · ${R.anio}${R.corte<12?" (en curso)":""}`;
-  $("heroTxt").textContent=`${R.ambito}: ${R.totBajas} bajas entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}, sobre una plantilla media de ${nf(R.media)} personas.`;
-  $("kVol").textContent=pf(R.iVol); $("kVolS").textContent=`${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)} de ${R.totBajas} bajas`;
-  $("kAnual").textContent=pf(R.anual); $("kAnualS").textContent=`Ritmo de ${R.corte} ${R.corte===1?"mes":"meses"} llevado a 12`; if(R.corte===12) $("kAnualS").textContent="Año cerrado: coincide con el índice";;
+  $("heroTxt").textContent=chica
+    ? `${R.ambito}: ${R.totBajas} ${R.totBajas===1?"baja":"bajas"} y ${R.totAltas} ${R.totAltas===1?"alta":"altas"} entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}. La plantilla media (${nf(R.media)}) es menor al umbral de ${P.umbral}: el porcentaje no es representativo, se muestran los valores absolutos.`
+    : `${R.ambito}: ${R.totBajas} bajas entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}, sobre una plantilla media de ${nf(R.media)} personas.`;
+  $("kVol").textContent=chica?String(R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)):pf(R.iVol); $("kVolS").textContent=`${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)} de ${R.totBajas} bajas`;
+  $("kAnual").textContent=chica?"—":pf(R.anual); $("kAnualS").textContent=chica?"Filial chica: no se anualiza":`Ritmo de ${R.corte} ${R.corte===1?"mes":"meses"} llevado a 12`; if(!chica&&R.corte===12) $("kAnualS").textContent="Año cerrado: coincide con el índice";
   $("kBase").textContent=nf(R.media); $("kBaseS").textContent=`Cierre: ${R.dot[R.dot.length-1]} · inicio: ${R.inicial}`;
   $("kTemp").textContent=R.tempranas;
   const ord=[...R.movs].sort((a,b)=>b.fecha-a.fecha);
@@ -273,8 +276,9 @@ function pintar(R){
 function filaValores(rows,headRow){ return rows.slice(headRow+1); }
 function leerParametros(v){
   const actual=+v[4][2], corte=+v[5][2], umbral=+(v[6][2]||15), filas=[];
-  for(let r=9;r<v.length;r++){ const y=v[r][1], n=v[r][2], i=v[r][3], m=String(v[r][4]??"").trim().toLowerCase();
-    if(typeof y==="number"&&typeof n==="string"&&n.trim()&&typeof i==="number"&&m!=="no") filas.push({anio:y,nombre:n.trim(),inicial:i}); }
+  for(let r=9;r<v.length;r++){ const y=v[r][1], n=v[r][2], raw=v[r][3], m=String(v[r][4]??"").trim().toLowerCase();
+    const txt=String(raw??"").trim(); const i=(txt==="")?0:Number(String(txt).replace(",","."));
+    if(typeof y==="number"&&typeof n==="string"&&n.trim()&&Number.isFinite(i)&&m!=="no") filas.push({anio:y,nombre:n.trim(),inicial:i,sinDot:txt===""}); }
   return {actual,corte,umbral,filas};
 }
 function paramAnio(P,y){
