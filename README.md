@@ -1,4 +1,4 @@
-# KPI RRHH 333
+# KPI 333
 
 Herramientas de RRHH de 333, publicadas con GitHub Pages en
 https://333avicola-byte.github.io/333Recursos-Humanos/
@@ -13,8 +13,8 @@ tocar nada más.
 |---|---|---|---|
 | Tablero RPE | rpe.html | Revenue per Employee: cuánto aporta cada FTE a la facturación mensual. | Excel "RPE KPI" · SharePoint |
 | Índice de rotación | rotacion.html | Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada. | Excel "Rotacion 333" · SharePoint |
-| Pirámide de jerarquías | piramide.html | Los cinco niveles de responsabilidad y las posiciones típicas de cada uno. | Contenido fijo en el archivo |
 | Equipo con Futuro | teambuilding.html | Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación. | Excel "Equipo con Futuro 333" · SharePoint |
+| Pirámide de jerarquías | piramide.html | Los cinco niveles de responsabilidad y las posiciones típicas de cada uno. | Contenido fijo en el archivo |
 
 Columnas: **Herramienta** es el título de la tarjeta, **Link** el archivo, **Descripción** el
 texto y **Datos** la etiqueta gris de abajo. El orden de las filas es el orden de las tarjetas.
