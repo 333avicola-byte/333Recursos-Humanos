@@ -65,6 +65,8 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
 .chg{text-align:right;font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .items{padding:0 0 10px 34px}
 .row{display:grid;grid-template-columns:1fr 44px 64px;gap:10px;align-items:center;padding:6px 0;font-size:12.5px}
+.mini{position:relative;height:230px;margin:6px 0 10px}
+.qn{color:var(--azul);margin-right:4px}
 .bars{display:grid;gap:3px;margin-top:4px}
 .bars span{display:block;height:6px;border-radius:3px}
 .bars .p{background:var(--prev)}.bars .n{background:var(--azul)}.bars .n.low{background:var(--naranja)}
@@ -118,19 +120,19 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
     <div class="chart"><canvas id="c1" aria-label="Promedio por dimensión y ola"></canvas></div>
   </section>
   <details class="panel more">
-    <summary class="moresum"><span class="plus" aria-hidden="true"></span><span><b>Ver detalle</b><span class="sub"> · las 5 preguntas de cada dimensión</span></span></summary>
+    <summary class="moresum"><span class="plus" aria-hidden="true"></span><span><b>Ver detalle</b><span class="sub"> · pulso de las 5 preguntas de cada dimensión</span></span></summary>
     <div id="list"></div>
   </details>
   <p class="msg" id="msg"></p>
 </div>
-<script id="data" type="application/json">{"items": [{"d": "Visión compartida", "i": "Conocemos los objetivos del equipo"}, {"d": "Visión compartida", "i": "Entendemos las prioridades del negocio"}, {"d": "Visión compartida", "i": "Sabemos qué se espera de nosotros"}, {"d": "Visión compartida", "i": "Sabemos cómo impacta nuestro trabajo"}, {"d": "Visión compartida", "i": "Se comunican cambios de manera clara"}, {"d": "Sentido de unidad", "i": "Hay colaboración entre miembros del equipo"}, {"d": "Sentido de unidad", "i": "Existe confianza en el equipo"}, {"d": "Sentido de unidad", "i": "Se comparten responsabilidades"}, {"d": "Sentido de unidad", "i": "Se resuelven conflictos de manera constructiva"}, {"d": "Sentido de unidad", "i": "Se prioriza el equipo sobre lo individual"}, {"d": "Composición del equipo", "i": "Existen roles claros"}, {"d": "Composición del equipo", "i": "Las responsabilidades están bien definidas"}, {"d": "Composición del equipo", "i": "Hay equilibrio en la carga de trabajo"}, {"d": "Composición del equipo", "i": "Contamos con las personas adecuadas"}, {"d": "Composición del equipo", "i": "Hay buena organización del equipo"}, {"d": "Compromiso extremo", "i": "Nos hacemos responsables de los resultados"}, {"d": "Compromiso extremo", "i": "Cumplimos con lo prometido"}, {"d": "Compromiso extremo", "i": "Damos un esfuerzo extra cuando es necesario"}, {"d": "Compromiso extremo", "i": "Se cumple con tiempos y objetivos"}, {"d": "Compromiso extremo", "i": "Hay responsabilidad colectiva"}, {"d": "Espíritu irreductible", "i": "Buscamos soluciones activamente"}, {"d": "Espíritu irreductible", "i": "Mantenemos actitud positiva"}, {"d": "Espíritu irreductible", "i": "Nos adaptamos a cambios"}, {"d": "Espíritu irreductible", "i": "Enfrentamos los problemas rápidamente"}, {"d": "Espíritu irreductible", "i": "Hay resiliencia en el equipo"}, {"d": "Manejo del talento", "i": "Se recibe feedback frecuente"}, {"d": "Manejo del talento", "i": "Se asignan tareas según capacidades"}, {"d": "Manejo del talento", "i": "Hay oportunidades de crecimiento"}, {"d": "Manejo del talento", "i": "Se detectan talentos dentro del equipo"}, {"d": "Manejo del talento", "i": "Se capacita al equipo"}, {"d": "Humildad & ambición", "i": "Estamos abiertos a aprender"}, {"d": "Humildad & ambición", "i": "Aceptamos errores"}, {"d": "Humildad & ambición", "i": "Existe espíritu de superación"}, {"d": "Humildad & ambición", "i": "Se busca crecer como equipo"}, {"d": "Humildad & ambición", "i": "Se comparten ideas"}, {"d": "Sentido común", "i": "Resolvemos problemas de forma simple"}, {"d": "Sentido común", "i": "Se enfoca en soluciones concretas"}, {"d": "Sentido común", "i": "Se actúa con criterio"}, {"d": "Sentido común", "i": "Se utilizan los recursos de manera eficiente"}, {"d": "Sentido común", "i": "Cuestionamos prácticas innecesarias y proponemos formas más simples de hacer las cosas"}], "olas": [{"name": "Marzo 2026", "date": "2026-03-26", "n": 21, "items": [{"p": 4.45, "f": 0.95, "n": 20}, {"p": 4.1, "f": 0.8, "n": 20}, {"p": 4.1, "f": 0.85, "n": 20}, {"p": 4.4, "f": 0.75, "n": 20}, {"p": 3.25, "f": 0.45, "n": 20}, {"p": 4.55, "f": 0.95, "n": 20}, {"p": 4.2, "f": 0.9, "n": 20}, {"p": 4.05, "f": 0.7, "n": 20}, {"p": 3.75, "f": 0.6, "n": 20}, {"p": 3.9, "f": 0.75, "n": 20}, {"p": 3.65, "f": 0.65, "n": 20}, {"p": 3.45, "f": 0.6, "n": 20}, {"p": 3.6, "f": 0.7, "n": 20}, {"p": 4.4, "f": 0.9, "n": 20}, {"p": 3.8, "f": 0.8, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.35, "f": 0.85, "n": 20}, {"p": 4.9, "f": 0.95, "n": 20}, {"p": 4.2, "f": 0.85, "n": 20}, {"p": 4.1, "f": 0.8, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.1, "f": 0.7, "n": 20}, {"p": 4.05, "f": 0.75, "n": 20}, {"p": 4.3, "f": 0.8, "n": 20}, {"p": 4.3, "f": 0.85, "n": 20}, {"p": 4.2632, "f": 0.8421, "n": 19}, {"p": 4.1579, "f": 0.8421, "n": 19}, {"p": 4.2105, "f": 0.7895, "n": 19}, {"p": 4.0526, "f": 0.7895, "n": 19}, {"p": 4.3158, "f": 0.8421, "n": 19}, {"p": 4.8, "f": 1, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.6, "f": 0.9, "n": 20}, {"p": 4.75, "f": 0.95, "n": 20}, {"p": 4.4, "f": 0.9, "n": 20}, {"p": 4.05, "f": 0.85, "n": 20}, {"p": 4.25, "f": 0.95, "n": 20}, {"p": 4.35, "f": 0.9, "n": 20}, {"p": 4.15, "f": 0.8, "n": 20}, {"p": 4, "f": 0.85, "n": 20}]}], "th": {"min": 3.8, "delta": 0.4, "fav": 0.7}, "next": "septiembre 2026"}</script>
+<script id="data" type="application/json">{"items": [{"d": "Visión compartida", "i": "Conocemos los objetivos del equipo"}, {"d": "Visión compartida", "i": "Entendemos las prioridades del negocio"}, {"d": "Visión compartida", "i": "Sabemos qué se espera de nosotros"}, {"d": "Visión compartida", "i": "Sabemos cómo impacta nuestro trabajo"}, {"d": "Visión compartida", "i": "Se comunican cambios de manera clara"}, {"d": "Sentido de unidad", "i": "Hay colaboración entre miembros del equipo"}, {"d": "Sentido de unidad", "i": "Existe confianza en el equipo"}, {"d": "Sentido de unidad", "i": "Se comparten responsabilidades"}, {"d": "Sentido de unidad", "i": "Se resuelven conflictos de manera constructiva"}, {"d": "Sentido de unidad", "i": "Se prioriza el equipo sobre lo individual"}, {"d": "Composición del equipo", "i": "Existen roles claros"}, {"d": "Composición del equipo", "i": "Las responsabilidades están bien definidas"}, {"d": "Composición del equipo", "i": "Hay equilibrio en la carga de trabajo"}, {"d": "Composición del equipo", "i": "Contamos con las personas adecuadas"}, {"d": "Composición del equipo", "i": "Hay buena organización del equipo"}, {"d": "Compromiso extremo", "i": "Nos hacemos responsables de los resultados"}, {"d": "Compromiso extremo", "i": "Cumplimos con lo prometido"}, {"d": "Compromiso extremo", "i": "Damos un esfuerzo extra cuando es necesario"}, {"d": "Compromiso extremo", "i": "Se cumple con tiempos y objetivos"}, {"d": "Compromiso extremo", "i": "Hay responsabilidad colectiva"}, {"d": "Espíritu irreductible", "i": "Buscamos soluciones activamente"}, {"d": "Espíritu irreductible", "i": "Mantenemos actitud positiva"}, {"d": "Espíritu irreductible", "i": "Nos adaptamos a cambios"}, {"d": "Espíritu irreductible", "i": "Enfrentamos los problemas rápidamente"}, {"d": "Espíritu irreductible", "i": "Hay resiliencia en el equipo"}, {"d": "Manejo del talento", "i": "Se recibe feedback frecuente"}, {"d": "Manejo del talento", "i": "Se asignan tareas según capacidades"}, {"d": "Manejo del talento", "i": "Hay oportunidades de crecimiento"}, {"d": "Manejo del talento", "i": "Se detectan talentos dentro del equipo"}, {"d": "Manejo del talento", "i": "Se capacita al equipo"}, {"d": "Humildad & ambición", "i": "Estamos abiertos a aprender"}, {"d": "Humildad & ambición", "i": "Aceptamos errores"}, {"d": "Humildad & ambición", "i": "Existe espíritu de superación"}, {"d": "Humildad & ambición", "i": "Se busca crecer como equipo"}, {"d": "Humildad & ambición", "i": "Se comparten ideas"}, {"d": "Sentido común", "i": "Resolvemos problemas de forma simple"}, {"d": "Sentido común", "i": "Se enfoca en soluciones concretas"}, {"d": "Sentido común", "i": "Se actúa con criterio"}, {"d": "Sentido común", "i": "Se utilizan los recursos de manera eficiente"}, {"d": "Sentido común", "i": "Cuestionamos prácticas innecesarias y proponemos formas más simples de hacer las cosas"}], "olas": [{"name": "Marzo 2026", "date": "2026-03-26", "n": 21, "items": [{"p": 4.45, "f": 0.95, "n": 20}, {"p": 4.1, "f": 0.8, "n": 20}, {"p": 4.1, "f": 0.85, "n": 20}, {"p": 4.4, "f": 0.75, "n": 20}, {"p": 3.25, "f": 0.45, "n": 20}, {"p": 4.55, "f": 0.95, "n": 20}, {"p": 4.2, "f": 0.9, "n": 20}, {"p": 4.05, "f": 0.7, "n": 20}, {"p": 3.75, "f": 0.6, "n": 20}, {"p": 3.9, "f": 0.75, "n": 20}, {"p": 3.65, "f": 0.65, "n": 20}, {"p": 3.45, "f": 0.6, "n": 20}, {"p": 3.6, "f": 0.7, "n": 20}, {"p": 4.4, "f": 0.9, "n": 20}, {"p": 3.8, "f": 0.8, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.35, "f": 0.85, "n": 20}, {"p": 4.9, "f": 0.95, "n": 20}, {"p": 4.2, "f": 0.85, "n": 20}, {"p": 4.1, "f": 0.8, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.1, "f": 0.7, "n": 20}, {"p": 4.05, "f": 0.75, "n": 20}, {"p": 4.3, "f": 0.8, "n": 20}, {"p": 4.3, "f": 0.85, "n": 20}, {"p": 4.2632, "f": 0.8421, "n": 19}, {"p": 4.1579, "f": 0.8421, "n": 19}, {"p": 4.2105, "f": 0.7895, "n": 19}, {"p": 4.0526, "f": 0.7895, "n": 19}, {"p": 4.3158, "f": 0.8421, "n": 19}, {"p": 4.8, "f": 1, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.6, "f": 0.9, "n": 20}, {"p": 4.75, "f": 0.95, "n": 20}, {"p": 4.4, "f": 0.9, "n": 20}, {"p": 4.05, "f": 0.85, "n": 20}, {"p": 4.25, "f": 0.95, "n": 20}, {"p": 4.35, "f": 0.9, "n": 20}, {"p": 4.15, "f": 0.8, "n": 20}, {"p": 4, "f": 0.85, "n": 20}]}, {"name": "Septiembre 2026", "n": 20, "items": [{"p": 4.7, "f": 0.95, "n": 20}, {"p": 4.8, "f": 0.95, "n": 20}, {"p": 4.55, "f": 0.9, "n": 20}, {"p": 4.65, "f": 0.9, "n": 20}, {"p": 4.15, "f": 0.75, "n": 20}, {"p": 4.625, "f": 0.9375, "n": 16}, {"p": 4.5625, "f": 0.9375, "n": 16}, {"p": 4.1875, "f": 0.8125, "n": 16}, {"p": 4.3125, "f": 0.875, "n": 16}, {"p": 4.375, "f": 0.8125, "n": 16}, {"p": 4.5, "f": 0.8571428571428571, "n": 14}, {"p": 4.571428571428571, "f": 0.8571428571428571, "n": 14}, {"p": 4.428571428571429, "f": 0.7857142857142857, "n": 14}, {"p": 4.714285714285714, "f": 0.9285714285714286, "n": 14}, {"p": 4.571428571428571, "f": 0.9285714285714286, "n": 14}, {"p": 4.733333333333333, "f": 0.8666666666666667, "n": 15}, {"p": 4.733333333333333, "f": 1.0, "n": 15}, {"p": 4.933333333333334, "f": 1.0, "n": 15}, {"p": 4.4, "f": 0.8666666666666667, "n": 15}, {"p": 4.733333333333333, "f": 0.9333333333333333, "n": 15}, {"p": 4.8125, "f": 1.0, "n": 16}, {"p": 4.875, "f": 1.0, "n": 16}, {"p": 4.6875, "f": 0.9375, "n": 16}, {"p": 4.75, "f": 0.9375, "n": 16}, {"p": 4.75, "f": 1.0, "n": 16}, {"p": 4.705882352941177, "f": 0.9411764705882353, "n": 17}, {"p": 4.588235294117647, "f": 0.8823529411764706, "n": 17}, {"p": 4.235294117647059, "f": 0.7647058823529411, "n": 17}, {"p": 4.588235294117647, "f": 0.9411764705882353, "n": 17}, {"p": 4.588235294117647, "f": 0.9411764705882353, "n": 17}, {"p": 4.9375, "f": 1.0, "n": 16}, {"p": 4.6875, "f": 1.0, "n": 16}, {"p": 4.875, "f": 1.0, "n": 16}, {"p": 4.8125, "f": 0.9375, "n": 16}, {"p": 4.75, "f": 0.9375, "n": 16}, {"p": 4.357142857142857, "f": 0.9285714285714286, "n": 14}, {"p": 4.5, "f": 0.7857142857142857, "n": 14}, {"p": 4.642857142857143, "f": 0.8571428571428571, "n": 14}, {"p": 4.571428571428571, "f": 0.9285714285714286, "n": 14}, {"p": 4.071428571428571, "f": 0.7142857142857143, "n": 14}]}], "th": {"min": 3.8, "delta": 0.4, "fav": 0.7}, "next": "marzo 2027"}</script>
 <script>
 (function(){
 const CONFIG={
   tenantId:"a7f469f2-8d30-43b8-bcef-a8d83aa54321",
   clientId:"7941b150-5955-4a1b-b981-77b41176bafe",
   archivo:"Equipo_con_Futuro_333.xlsx",
-  driveId:"", itemId:"",             // opcional: si se completan, no busca por nombre
+  driveId:"b!rqNjxgZR006dsg1rF-IbP8aOnJ_DFeZMhj47u1qyCPkw888yGAUoQIifVRKP33W7", itemId:"013VOM2IW6OA7IGLRF4FFLY3IX3HG6HZBZ",             // opcional: si se completan, no busca por nombre
   scopes:["Files.Read.All"],
   refreshMs:600000
 };
@@ -178,7 +180,7 @@ function render(){
  const low=ob.items.filter(x=>x.p!=null&&x.p<S.th.min).length;
  const k=(e,v,s)=>`<div class="kpi"><div class="eyebrow">${e}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
  let h;
- if(oa){const s=[...dims].sort((x,y)=>(y.b-y.a)-(x.b-x.a));h=k('Más subió',s[0].d,chg(s[0].b-s[0].a))+k('Más bajó',s[s.length-1].d,chg(s[s.length-1].b-s[s.length-1].a))}
+ if(oa){const s=[...dims].sort((x,y)=>(y.b-y.a)-(x.b-x.a));h=k('Más subió',s[0].d,chg(s[0].b-s[0].a))+k((s[s.length-1].b-s[s.length-1].a)<0?'Más bajó':'Menos subió',s[s.length-1].d,chg(s[s.length-1].b-s[s.length-1].a))}
  else{const s=[...dims].sort((x,y)=>y.b-x.b),l=s[s.length-1];h=k('Dimensión más fuerte',s[0].d,nf(s[0].b))+k('Dimensión más débil',l.d,`<span class="${l.b<S.th.min?'neg':''}">${nf(l.b)}</span>`)}
  h+=k('Bajo el mínimo',`${low} de ${ITEMS.length}`,`preguntas debajo de ${n1(S.th.min)}`)+k('Participantes',ob.n??'—',oa&&oa.n?`${oa.n} en ${oa.name}`:'personas que respondieron');
  $('kpis').innerHTML=h;
@@ -194,11 +196,48 @@ function render(){
    scales:{x:{min:1,max:5,ticks:{stepSize:1,color:css('--muted'),font:{family:FONT,size:11}},grid:{color:css('--line')}},
            y:{ticks:{color:css('--ink'),font:{family:FONT,size:12,weight:'600'}},grid:{display:false}}},
    plugins:{legend:{display:n>1,position:'bottom',labels:{color:css('--ink'),font:{family:FONT,size:11},boxWidth:14}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${nf(c.raw)}`}}}}});
- // detalle
+ // detalle: pulso por pregunta dentro de cada dimensión
+ DET={V,ob,oa,cols};
  $('list').innerHTML=dims.map(({d,a,b})=>{
-  const rows=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([x,i])=>{const pb=ob.items[i].p,pa=oa?oa.items[i].p:null;
-   return `<div class="row"><div>${x.i}<div class="bars">${V.map((o,j)=>{const v=o.items[i].p;return j===n-1?`<span class="n ${v!=null&&v<S.th.min?'low':''}" style="width:${w(v)}%"></span>`:`<span style="width:${w(v)}%;background:${cols[j]}" title="${o.name}: ${nf(v)}"></span>`}).join('')}</div></div><span class="val ${pb!=null&&pb<S.th.min?'low':''}">${nf(pb)}</span><span class="chg">${chg(pa!=null&&pb!=null?pb-pa:null)}</span></div>`}).join('');
-  return `<details><summary><span class="plus" aria-hidden="true"></span><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span><span class="chg">${chg(a!=null?b-a:null)}</span></summary><div class="items">${rows}</div></details>`}).join('');
+  let q=0;
+  const rows=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([x,i])=>{q++;const pb=ob.items[i].p,pa=oa?oa.items[i].p:null;
+   return `<div class="row"><div><b class="qn">P${q}</b> ${x.i}</div><span class="val ${pb!=null&&pb<S.th.min?'low':''}">${nf(pb)}</span><span class="chg">${chg(pa!=null&&pb!=null?pb-pa:null)}</span></div>`}).join('');
+  return `<details data-d="${d}"><summary><span class="plus" aria-hidden="true"></span><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span><span class="chg">${chg(a!=null?b-a:null)}</span></summary><div class="items"><div class="mini"><canvas aria-label="Pulso de ${d}"></canvas></div>${rows}</div></details>`}).join('');
+ $('list').querySelectorAll('details').forEach(el=>el.addEventListener('toggle',()=>{ if(el.open) pulso(el); }));
+}
+
+let DET=null; const MINI=new Map();
+function colP(v,dl){ if(dl!=null){ if(dl>=S.th.delta) return '#5E9A1E'; if(dl<=-S.th.delta){const t=Math.min(1,(-dl-S.th.delta)/(S.th.delta*2)),A=[246,214,120],B=[217,48,37];return '#'+A.map((c,j)=>Math.round(c+(B[j]-c)*t).toString(16).padStart(2,'0')).join('')} return '#1F6DB1'; }
+  return v!=null&&v<S.th.min?css('--naranja'):'#1F6DB1'; }
+function pulso(el){
+ if(!window.Chart||!DET) return;
+ const d=el.dataset.d, cv=el.querySelector('canvas'); const {V,oa}=DET, n=V.length;
+ const idx=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([,i])=>i);
+ const NARROW=innerWidth<640, GR=['#B7BCC2','#8A9099','#53565A'];
+ const g0=cv.getContext('2d'), grad=g0.createLinearGradient(0,0,0,240); grad.addColorStop(0,'rgba(31,109,177,.22)'); grad.addColorStop(1,'rgba(31,109,177,0)');
+ const ds=V.map((o,j)=>{const last=j===n-1, data=idx.map(i=>o.items[i].p), gc=GR[Math.max(0,GR.length-(n-1)+j)]||GR[0];
+  return {label:o.name,data,tension:.42,cubicInterpolationMode:'monotone',clip:false,order:last?1:2,borderColor:last?'#1F6DB1':gc,borderWidth:last?3:2,
+   fill:last?'start':false,backgroundColor:last?grad:'transparent',pointRadius:last?6:3,pointHoverRadius:8,pointBorderWidth:2.5,pointBorderColor:'#fff',
+   pointBackgroundColor:last?data.map((v,k)=>colP(v,oa&&v!=null&&oa.items[idx[k]].p!=null?v-oa.items[idx[k]].p:null)):gc}});
+ const all=ds.flatMap(x=>x.data).filter(x=>x!=null);
+ const minH={id:'minH',afterDatasetsDraw(c){const y=c.scales.y,a=c.chartArea,gx=c.ctx;const py=y.getPixelForValue(S.th.min);if(py<a.top||py>a.bottom)return;
+  gx.save();gx.strokeStyle=css('--naranja');gx.lineWidth=1.5;gx.setLineDash([5,4]);gx.beginPath();gx.moveTo(a.left,py);gx.lineTo(a.right,py);gx.stroke();
+  gx.setLineDash([]);gx.fillStyle=css('--naranja');gx.font='700 10px '+FONT;gx.textAlign='right';gx.fillText('mín. '+n1(S.th.min),a.right,py-5);gx.restore();}};
+ const pills={id:'pillsM',afterDatasetsDraw(c){const last=c.data.datasets.length-1,m=c.getDatasetMeta(last),dd=c.data.datasets[last].data,gx=c.ctx;
+  gx.save();gx.textAlign='center';gx.textBaseline='middle';gx.font='800 11px '+FONT;
+  m.data.forEach((p,k)=>{const v=dd[k];if(v==null)return;const pv=oa?oa.items[idx[k]].p:null,dl=pv!=null?Math.round((v-pv)*100)/100||0:null;
+   const txt=dl!=null?`${dl>=S.th.delta?'▲ ':dl<=-S.th.delta?'▼ ':''}${dl>0?'+':''}${nf(dl)}`:nf(v), col=colP(v,dl), w=gx.measureText(txt).width+12, x=Math.max(p.x,c.chartArea.left+w/2), y=p.y-(innerWidth<640&&k%2?34:20);
+   gx.fillStyle=col;gx.beginPath();gx.roundRect?gx.roundRect(x-w/2,y-9,w,18,9):gx.rect(x-w/2,y-9,w,18);gx.fill();
+   gx.fillStyle=(dl!=null&&dl<=-S.th.delta&&-dl<S.th.delta*2)?'#1B2A3A':'#fff';gx.fillText(txt,x,y+1);});gx.restore();}};
+ const opts={maintainAspectRatio:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:innerWidth<640?40:26,left:4,right:8}},
+  animations:{y:{duration:1100,easing:'easeOutElastic',from:ctx=>ctx.type==='data'&&ctx.chart.chartArea?ctx.chart.chartArea.bottom:undefined}},
+  scales:{y:{min:Math.max(1,Math.floor((Math.min(S.th.min,...all)-.4)*2)/2),max:5.2,ticks:{stepSize:.5,callback:v=>v<=5?nf(v).replace(',00',''):'',font:{family:FONT,size:10}},grid:{color:css('--line')}},
+          x:{offset:true,grid:{display:false},ticks:{font:{family:FONT,size:11,weight:'700'},color:css('--ink')}}},
+  plugins:{legend:{display:n>1,position:'bottom',labels:{boxWidth:22,boxHeight:3,font:{family:FONT,size:11,weight:'700'},
+     generateLabels:c=>c.data.datasets.map((x,i)=>({text:x.label,fillStyle:x.borderColor,strokeStyle:x.borderColor,lineWidth:0,fontColor:x.borderColor,datasetIndex:i,hidden:!c.isDatasetVisible(i)}))}},
+   tooltip:{callbacks:{title:it=>ITEMS[idx[it[0].dataIndex]].i,label:c=>`${c.dataset.label}: ${nf(c.raw)}`}}}};
+ if(MINI.has(cv)) MINI.get(cv).destroy();
+ MINI.set(cv,new Chart(cv,{type:'line',data:{labels:idx.map((_,k)=>'P'+(k+1)),datasets:ds},options:opts,plugins:[minH,pills]}));
 }
 
 // ---- lectura en vivo del Excel (misma conexión que RPE y Rotación)
@@ -244,18 +283,18 @@ async function leer(){
 }
 async function iniciar(){
  $('login').hidden=true;
- if(!window.msal){setChip('warn','Copia al 21/09 · no cargó el inicio de sesión');return}
+ if(!window.msal){setChip('warn','Copia al 28/09 · no cargó el inicio de sesión');return}
  pca=new msal.PublicClientApplication({auth:{clientId:CONFIG.clientId,authority:'https://login.microsoftonline.com/'+CONFIG.tenantId,redirectUri:location.origin+location.pathname},cache:{cacheLocation:'localStorage'}});
  try{const r=await pca.handleRedirectPromise();if(r&&r.account)account=r.account}catch(e){}
  account=account||pca.getAllAccounts()[0]||null;
- if(!account){setChip('warn','Copia al 21/09 · iniciá sesión para ver en vivo');$('login').hidden=false;return}
+ if(!account){setChip('warn','Copia al 28/09 · iniciá sesión para ver en vivo');$('login').hidden=false;return}
  leer();clearInterval(timer);timer=setInterval(leer,CONFIG.refreshMs);
 }
 $('login').addEventListener('click',()=>pca.loginRedirect({scopes:CONFIG.scopes}));
 $('refresh').addEventListener('click',()=>{account?leer():iniciar()});
 render();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>render());
-try{iniciar()}catch(e){setChip('warn','Copia al 21/09')}
+try{iniciar()}catch(e){setChip('warn','Copia al 28/09')}
 })();
 </script>
 </body>
