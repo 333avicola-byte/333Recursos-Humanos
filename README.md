@@ -12,7 +12,7 @@ tocar nada más.
 | Herramienta | Link | Descripción | Datos |
 |---|---|---|---|
 | Tablero RPE | rpe.html | Revenue per Employee anual por filial: 2025 real vs 2026 proyectado. | Excel "RPE Anual 333" · SharePoint |
-| Índice de rotación | rotacion.html | Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada. | Excel "Rotacion 333" · SharePoint |
+| Índice de rotación | rotacion.html | Rotación independiente por filial, con semáforo vs Mercer: sana, cuidado o corregir. | Excel "Rotacion 333" · SharePoint |
 | Equipo con Futuro | teambuilding.html | Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación. | Excel "Equipo con Futuro 333" · SharePoint |
 | Pirámide de jerarquías | piramide.html | Los cinco niveles de responsabilidad y las posiciones típicas de cada uno. | Contenido fijo en el archivo |
 
@@ -31,6 +31,14 @@ texto y **Datos** la etiqueta gris de abajo. El orden de las filas es el orden d
 2. Hoja **FTE mensual**: cargar el FTE de cada mes por filial (el año en curso: meses reales + dotación prevista).
 3. Al cerrar el año, cambiar Tipo de "Proyectado" a "Real" y cargar el cierre. Para un año nuevo, sumar sus filas copiando el formato.
 4. El tablero compara el último año contra el anterior. Colores de la variación: verde si sube; si cae, de amarillo suave a rojo (−10% o más).
+
+## Rotación: cómo se lee
+
+- Cada filial se mide por separado (Corporate, LATAM, Argentina, Brasil); no hay total combinado.
+- Filiales con menos personas que el umbral de Parametros muestran igual el porcentaje, con la etiqueta «base chica».
+- Semáforo (rotación voluntaria anualizada): Sana < 13% · Cuidado 13–20% · Corregir > 20%.
+  Referencia: Mercer, US Turnover Survey 2025 (promedio voluntario 13%). El corte de 20% es criterio interno.
+  Los valores están en el bloque `REF` de rotacion.html.
 
 ## Actualización semestral (Equipo con Futuro)
 
