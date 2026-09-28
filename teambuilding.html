@@ -65,10 +65,14 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
 .chg{text-align:right;font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .items{padding:0 0 10px 34px}
 .row{display:grid;grid-template-columns:1fr 44px 64px;gap:10px;align-items:center;padding:6px 0;font-size:12.5px}
-.mini{position:relative;height:210px;margin:4px 0 6px}
+.mini{position:relative;height:190px;margin:4px 0 6px}
 #list{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .dimcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
-.dimhead{display:grid;grid-template-columns:1fr 44px 64px;gap:10px;align-items:center}
+.dimhead{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.avgb{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;font-weight:800;font-size:13px}
+.avgb small{font-weight:600;font-size:11px;opacity:.85}
+.avgb.up{background:#E6F2D5;color:#3F6B12}.avgb.up0{background:#EEF4E6;color:#4F7A1E}
+.avgb.down{background:#FBD9D5;color:#A3261A}.avgb.down0{background:#FFF3C4;color:#7A5A00}.avgb.eq0{background:#EEF1F4;color:#53565A}
 .dimcard details{border-top:1px solid var(--line)}
 .qsum{grid-template-columns:24px 1fr!important;padding:8px 0!important}
 .dimcard .items{padding:0 0 6px 0}
@@ -127,7 +131,7 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
     <div class="chart"><canvas id="c1" aria-label="Promedio por dimensión y ola"></canvas></div>
   </section>
   <details class="panel more" open>
-    <summary class="moresum"><span class="plus" aria-hidden="true"></span><span><b>Ver detalle</b><span class="sub"> · pulso de las 5 preguntas de cada dimensión</span></span></summary>
+    <summary class="moresum"><span class="plus" aria-hidden="true"></span><span><b>Ver detalle</b><span class="sub"> · pulso del promedio de cada dimensión por medición</span></span></summary>
     <div id="list"></div>
   </details>
   <p class="msg" id="msg"></p>
@@ -209,7 +213,9 @@ function render(){
   let q=0;
   const rows=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([x,i])=>{q++;const pb=ob.items[i].p,pa=oa?oa.items[i].p:null;
    return `<div class="row"><div><b class="qn">P${q}</b> ${x.i}</div><span class="val ${pb!=null&&pb<S.th.min?'low':''}">${nf(pb)}</span><span class="chg">${chg(pa!=null&&pb!=null?pb-pa:null)}</span></div>`}).join('');
-  return `<div class="dimcard" data-d="${d}"><div class="dimhead"><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span><span class="chg">${chg(a!=null?b-a:null)}</span></div>
+  const dl=a!=null?Math.round((b-a)*100)/100||0:null, e=dl==null?'':dl>=S.th.delta?'up':dl<=-S.th.delta?'down':dl>0?'up0':dl<0?'down0':'eq0';
+  const badge=dl==null?'':`<span class="avgb ${e}" title="Cambio del promedio de las 5 preguntas vs ${oa.name}">${dl>0?'▲':dl<0?'▼':'='} ${dl>0?'+':''}${nf(dl)} <small>promedio vs ${oa.name}</small></span>`;
+  return `<div class="dimcard" data-d="${d}"><div class="dimhead"><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span></div>${badge}
    <div class="mini"><canvas aria-label="Pulso de ${d}"></canvas></div>
    <details><summary class="qsum"><span class="plus" aria-hidden="true"></span><span class="sub">Ver las 5 preguntas</span></summary><div class="items">${rows}</div></details></div>`}).join('');
  dibujarTodos();
@@ -221,33 +227,26 @@ function colP(v,dl){ if(dl!=null){ if(dl>=S.th.delta) return '#5E9A1E'; if(dl<=-
 function dibujarTodos(){ const m=document.querySelector('details.more'); if(!m||!m.open) return; document.querySelectorAll('#list .dimcard').forEach(pulso); }
 function pulso(el){
  if(!window.Chart||!DET) return;
- const d=el.dataset.d, cv=el.querySelector('.mini canvas'); const {V,oa}=DET, n=V.length;
- const idx=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([,i])=>i);
- const NARROW=innerWidth<640, GR=['#B7BCC2','#8A9099','#53565A'];
- const g0=cv.getContext('2d'), grad=g0.createLinearGradient(0,0,0,240); grad.addColorStop(0,'rgba(31,109,177,.22)'); grad.addColorStop(1,'rgba(31,109,177,0)');
- const ds=V.map((o,j)=>{const last=j===n-1, data=idx.map(i=>o.items[i].p), gc=GR[Math.max(0,GR.length-(n-1)+j)]||GR[0];
-  return {label:o.name,data,tension:.42,cubicInterpolationMode:'monotone',clip:false,order:last?1:2,borderColor:last?'#1F6DB1':gc,borderWidth:last?3:2,
-   fill:last?'start':false,backgroundColor:last?grad:'transparent',pointRadius:last?6:3,pointHoverRadius:8,pointBorderWidth:2.5,pointBorderColor:'#fff',
-   pointBackgroundColor:last?data.map((v,k)=>colP(v,oa&&v!=null&&oa.items[idx[k]].p!=null?v-oa.items[idx[k]].p:null)):gc}});
- const all=ds.flatMap(x=>x.data).filter(x=>x!=null);
+ const d=el.dataset.d, cv=el.querySelector('.mini canvas'); const {V}=DET;
+ const data=V.map(o=>agg(o,d)), labels=V.map(o=>o.name);
+ const g0=cv.getContext('2d'), grad=g0.createLinearGradient(0,0,0,220); grad.addColorStop(0,'rgba(31,109,177,.25)'); grad.addColorStop(1,'rgba(31,109,177,0)');
+ const colPt=k=>{const v=data[k];if(v==null)return '#1F6DB1';if(v<S.th.min)return css('--naranja');if(k===0)return '#8A9099';const dl=v-data[k-1];return dl>=S.th.delta?'#5E9A1E':dl<=-S.th.delta?'#D93025':'#1F6DB1';};
+ const ds=[{label:'Promedio de la dimensión',data,tension:.4,cubicInterpolationMode:'monotone',clip:false,borderColor:'#1F6DB1',borderWidth:3.5,
+   fill:'start',backgroundColor:grad,pointRadius:8,pointHoverRadius:10,pointBorderWidth:3,pointBorderColor:'#fff',pointBackgroundColor:data.map((_,k)=>colPt(k))}];
+ const all=data.filter(x=>x!=null);
  const minH={id:'minH',afterDatasetsDraw(c){const y=c.scales.y,a=c.chartArea,gx=c.ctx;const py=y.getPixelForValue(S.th.min);if(py<a.top||py>a.bottom)return;
   gx.save();gx.strokeStyle=css('--naranja');gx.lineWidth=1.5;gx.setLineDash([5,4]);gx.beginPath();gx.moveTo(a.left,py);gx.lineTo(a.right,py);gx.stroke();
   gx.setLineDash([]);gx.fillStyle=css('--naranja');gx.font='700 10px '+FONT;gx.textAlign='right';gx.fillText('mín. '+n1(S.th.min),a.right,py-5);gx.restore();}};
- const pills={id:'pillsM',afterDatasetsDraw(c){const last=c.data.datasets.length-1,m=c.getDatasetMeta(last),dd=c.data.datasets[last].data,gx=c.ctx;
-  gx.save();gx.textAlign='center';gx.textBaseline='middle';gx.font='800 11px '+FONT;
-  m.data.forEach((p,k)=>{const v=dd[k];if(v==null)return;const pv=oa?oa.items[idx[k]].p:null,dl=pv!=null?Math.round((v-pv)*100)/100||0:null;
-   const txt=dl!=null?`${dl>=S.th.delta?'▲ ':dl<=-S.th.delta?'▼ ':''}${dl>0?'+':''}${nf(dl)}`:nf(v), col=colP(v,dl), w=gx.measureText(txt).width+12, x=Math.max(p.x,c.chartArea.left+w/2), y=p.y-(innerWidth<640&&k%2?34:20);
-   gx.fillStyle=col;gx.beginPath();gx.roundRect?gx.roundRect(x-w/2,y-9,w,18,9):gx.rect(x-w/2,y-9,w,18);gx.fill();
-   gx.fillStyle=(dl!=null&&dl<=-S.th.delta&&-dl<S.th.delta*2)?'#1B2A3A':'#fff';gx.fillText(txt,x,y+1);});gx.restore();}};
- const opts={maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},layout:{padding:{top:innerWidth<640?40:26,left:4,right:8}},
+ const vals={id:'vals',afterDatasetsDraw(c){const m=c.getDatasetMeta(0),gx=c.ctx;gx.save();gx.textAlign='center';gx.textBaseline='middle';gx.font='800 12px '+FONT;
+  m.data.forEach((p,k)=>{const v=data[k];if(v==null)return;const txt=nf(v),w=gx.measureText(txt).width+14,x=p.x,y=p.y-22,col=colPt(k);
+   gx.fillStyle=col;gx.beginPath();gx.roundRect?gx.roundRect(x-w/2,y-10,w,20,10):gx.rect(x-w/2,y-10,w,20);gx.fill();gx.fillStyle='#fff';gx.fillText(txt,x,y+1);});gx.restore();}};
+ const opts={maintainAspectRatio:false,responsive:true,layout:{padding:{top:26,left:4,right:8}},
   animations:{y:{duration:1100,easing:'easeOutElastic',from:ctx=>ctx.type==='data'&&ctx.chart.chartArea?ctx.chart.chartArea.bottom:undefined}},
   scales:{y:{min:Math.max(1,Math.floor((Math.min(S.th.min,...all)-.4)*2)/2),max:5.2,ticks:{stepSize:.5,callback:v=>v<=5?nf(v).replace(',00',''):'',font:{family:FONT,size:10}},grid:{color:css('--line')}},
           x:{offset:true,grid:{display:false},ticks:{font:{family:FONT,size:11,weight:'700'},color:css('--ink')}}},
-  plugins:{legend:{display:n>1,position:'bottom',labels:{boxWidth:22,boxHeight:3,font:{family:FONT,size:11,weight:'700'},
-     generateLabels:c=>c.data.datasets.map((x,i)=>({text:x.label,fillStyle:x.borderColor,strokeStyle:x.borderColor,lineWidth:0,fontColor:x.borderColor,datasetIndex:i,hidden:!c.isDatasetVisible(i)}))}},
-   tooltip:{callbacks:{title:it=>ITEMS[idx[it[0].dataIndex]].i,label:c=>`${c.dataset.label}: ${nf(c.raw)}`}}}};
+  plugins:{legend:{display:false},tooltip:{callbacks:{title:it=>`${d} · ${it[0].label}`,label:c=>`Promedio de las 5 preguntas: ${nf(c.raw)}`}}}};
  if(MINI.has(cv)) MINI.get(cv).destroy();
- MINI.set(cv,new Chart(cv,{type:'line',data:{labels:idx.map((_,k)=>'P'+(k+1)),datasets:ds},options:opts,plugins:[minH,pills]}));
+ MINI.set(cv,new Chart(cv,{type:'line',data:{labels,datasets:ds},options:opts,plugins:[minH,vals]}));
 }
 
 document.addEventListener('toggle',e=>{ if(e.target.matches&&e.target.matches('details.more')&&e.target.open) dibujarTodos(); },true);
