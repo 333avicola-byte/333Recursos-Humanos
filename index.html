@@ -34,9 +34,11 @@ nav{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center
 @media (max-width:760px){.nav-in .links{display:none}}
 
 /* ===== PORTADA: título + accesos directos a los 4 tableros ===== */
-.hero{position:relative;height:calc(100svh + 30vh)}
-.hero-stick{position:sticky;top:52px;min-height:calc(100svh - 52px);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:28px 22px 56px;overflow:hidden}
+body{min-height:100svh;display:flex;flex-direction:column}
+.hero{position:relative;flex:1;display:flex}
+footer{padding:14px 22px calc(16px + env(safe-area-inset-bottom))!important}
+.hero-stick{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px 22px 24px;overflow:hidden}
 .orb{position:absolute;left:50%;top:40%;width:70vmax;height:70vmax;margin:-35vmax 0 0 -35vmax;border-radius:50%;z-index:-1;pointer-events:none;
   filter:blur(60px);opacity:.6;background:radial-gradient(circle at 30% 30%,var(--claro),transparent 60%),radial-gradient(circle at 70% 70%,rgba(45,133,209,.22),transparent 55%)}
 .hero-in{width:min(1120px,100%);display:flex;flex-direction:column;align-items:center}
@@ -49,12 +51,16 @@ nav{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center
 
 .tiles{margin-top:clamp(26px,4.5vh,48px);width:min(1120px,100%);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .tile{position:relative;display:flex;flex-direction:column;background:#fff;border-radius:28px;overflow:hidden;
-  box-shadow:0 1px 0 var(--line),0 20px 50px -30px rgba(14,27,43,.35);
-  transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+  box-shadow:0 1px 0 var(--line),0 20px 50px -30px rgba(14,27,43,.35);will-change:transform;
+  transition:transform .35s var(--ease),box-shadow .45s var(--ease)}
+.tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.3),transparent 45%)}
+@media (hover:hover){.tile:hover::after{opacity:1}}
+.orb{transition:transform .8s var(--ease)}
 .tile .mini{aspect-ratio:5/4;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 20% 10%,#EAF2FB 0%,#F7FAFD 55%,#fff 100%)}
 .tile .mini svg{width:82%;height:auto;max-height:96%;overflow:visible}
-.tile .body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:4px;flex:1}
+.tile .body{position:relative;z-index:1;padding:16px 20px 20px;display:flex;flex-direction:column;gap:4px;flex:1}
 .tile .n{font-size:11px;font-weight:700;color:var(--naranja);letter-spacing:.08em;text-transform:uppercase}
 .tile h2{font-size:clamp(17px,1.5vw,21px);font-weight:700;letter-spacing:-.025em;line-height:1.15}
 .tile p{font-size:13px;color:var(--muted);line-height:1.4}
@@ -220,13 +226,10 @@ footer{border-top:1px solid var(--line);padding:26px 22px calc(40px + env(safe-a
         <h1>KPI <span>333</span></h1>
       </div>
       <div class="tiles" id="tiles"></div>
-      <div class="scroll-cue enter">Deslizá para conocer cada indicador</div>
     </div>
   </div>
 </header>
 
-<main id="tools"></main>
-<div class="rail" id="rail" role="navigation" aria-label="Indicadores"></div>
 
 <footer>KPI 333 · Los tableros conectados a SharePoint piden iniciar sesión con la cuenta de 333.</footer>
 
@@ -236,8 +239,8 @@ footer{border-top:1px solid var(--line);padding:26px 22px calc(40px + env(safe-a
 /* Lista de tableros. Si el README del repo tiene la tabla "Herramientas", la portada la usa;
    si no se puede leer, queda esta lista. */
 const POR_DEFECTO=[
-  {nombre:"Tablero RPE",link:"rpe.html",desc:"Revenue per Employee: cuánto aporta cada FTE a la facturación mensual.",fuente:'Excel "RPE KPI" · SharePoint'},
-  {nombre:"Índice de rotación",link:"rotacion.html",desc:"Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada.",fuente:'Excel "Rotacion 333" · SharePoint'},
+  {nombre:"Tablero RPE",link:"rpe.html",desc:"Revenue per Employee anual por filial: 2025 real vs 2026 proyectado.",fuente:'Excel "RPE Anual 333" · SharePoint'},
+  {nombre:"Índice de rotación",link:"rotacion.html",desc:"Rotación independiente por filial, con semáforo vs Mercer: sana, cuidado o corregir.",fuente:'Excel "Rotacion 333" · SharePoint'},
   {nombre:"Equipo con Futuro",link:"teambuilding.html",desc:"Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación.",fuente:'Excel "Equipo con Futuro 333" · SharePoint'},
   {nombre:"Pirámide de jerarquías",link:"piramide.html",desc:"Los cinco niveles de responsabilidad y las posiciones típicas de cada uno.",fuente:"Contenido fijo en el archivo"}
 ];
@@ -356,66 +359,24 @@ function pintar(lista){
         <span class="go">Abrir <i>›</i></span>
       </div>
     </a>`).join("");
-  document.getElementById("tools").innerHTML=lista.map((h,i)=>`
-    <section class="tool" id="ind-${i+1}" data-i="${i}">
-      <div class="stage">
-        <div class="halo" aria-hidden="true"></div>
-        <div class="tool-in">
-          <div class="txt">
-            <div class="num k d1">Indicador ${String(i+1).padStart(2,"0")}</div>
-            <h3 class="k d2">${esc(h.nombre)}</h3>
-            ${h.desc?`<p class="k d3">${esc(h.desc)}</p>`:""}
-            ${h.fuente?`<div class="src k d3">${esc(h.fuente)}</div>`:""}
-            <a class="btn k d4" href="${esc(h.link)}">Abrir tablero ›</a>
-          </div>
-          <div class="vwrap"><a class="vis" href="${esc(h.link)}" aria-label="Abrir ${esc(h.nombre)}">${visual(h,"s"+i)}</a></div>
-        </div>
-      </div>
-    </section>`).join("");
-  document.getElementById("rail").innerHTML=lista.map((h,i)=>`<a href="#ind-${i+1}" data-i="${i}" aria-label="${esc(h.nombre)}"></a>`).join("");
   animar();
 }
 
 function animar(){
   const tiles=document.getElementById("tiles");
-  if(REDUCE||!("IntersectionObserver" in window)){
-    document.querySelectorAll(".tool,.tile").forEach(e=>e.classList.add("in","vivo")); return;
-  }
-  // accesos directos: dibujan su ilustración apenas entran
+  if(REDUCE){ tiles.querySelectorAll(".tile").forEach(t=>t.classList.add("in")); return; }
   setTimeout(()=>tiles.querySelectorAll(".tile").forEach(t=>t.classList.add("in")),450);
-  const tools=[...document.querySelectorAll(".tool")];
-  const ioV=new IntersectionObserver(es=>es.forEach(e=>{
-    e.target.classList.toggle("pausa",!e.isIntersecting);
-    if(e.isIntersecting&&e.intersectionRatio>=.15) e.target.classList.add("in","vivo");
-  }),{threshold:[0,.15]});
-  const ioR=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) activar(+e.target.dataset.i); }),{rootMargin:"-49% 0px -49% 0px"});
-  const ioM=new IntersectionObserver(es=>es.forEach(e=>document.getElementById("rail").classList.toggle("on",e.isIntersecting)),{rootMargin:"-45% 0px -45% 0px"});
-  tools.forEach(t=>{ioV.observe(t);ioR.observe(t);});
-  ioM.observe(document.getElementById("tools"));
-  observadores.push(ioV,ioR,ioM);
 }
-function activar(i){ document.querySelectorAll("#rail a").forEach(a=>a.classList.toggle("act",+a.dataset.i===i)); }
-
-/* inclinación suave al pasar el mouse sobre la ilustración */
+/* efecto Apple: la tarjeta se inclina siguiendo el mouse y el brillo lo acompaña */
 document.addEventListener("pointermove",ev=>{
-  if(ev.pointerType!=="mouse") return;
-  const v=ev.target.closest&&ev.target.closest(".vis"); if(!v) return;
-  const r=v.getBoundingClientRect(), x=(ev.clientX-r.left)/r.width-.5, y=(ev.clientY-r.top)/r.height-.5;
-  v.style.transform=`perspective(900px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.02)`;
+  if(ev.pointerType!=="mouse"||REDUCE) return;
+  const orb=document.querySelector(".orb"); if(orb){ const x=ev.clientX/innerWidth-.5, y=ev.clientY/innerHeight-.5; orb.style.transform=`translate3d(${x*40}px,${y*30}px,0)`; }
+  const t=ev.target.closest&&ev.target.closest(".tile"); if(!t) return;
+  const r=t.getBoundingClientRect(), x=(ev.clientX-r.left)/r.width, y=(ev.clientY-r.top)/r.height;
+  t.style.transform=`perspective(900px) rotateY(${(x-.5)*9}deg) rotateX(${(.5-y)*9}deg) translateY(-6px)`;
+  t.style.setProperty("--mx",(x*100)+"%"); t.style.setProperty("--my",(y*100)+"%");
 },{passive:true});
-document.addEventListener("pointerout",ev=>{ const v=ev.target.closest&&ev.target.closest(".vis"); if(v&&!v.contains(ev.relatedTarget)) v.style.transform=""; });
-
-/* riel: lleva al momento en que la escena está quieta */
-document.addEventListener("click",e=>{
-  const a=e.target.closest("#rail a"); if(!a) return;
-  const t=document.getElementById("ind-"+(+a.dataset.i+1)); if(!t) return;
-  e.preventDefault();
-  const top=t.getBoundingClientRect().top+scrollY;
-  const fija=getComputedStyle(t.querySelector(".stage")).position==="sticky";
-  scrollTo({top:fija?top+(t.offsetHeight+innerHeight)*.42-innerHeight:top-52,behavior:REDUCE?"auto":"smooth"});
-});
-
-document.body.classList.add(SDA&&!REDUCE?"sda":"rev");
+document.addEventListener("pointerout",ev=>{ const t=ev.target.closest&&ev.target.closest(".tile"); if(t&&!t.contains(ev.relatedTarget)) t.style.transform=""; });
 pintar(POR_DEFECTO);
 
 /* README: solo repinta si la lista cambió (así la portada no "salta" al cargar) */
