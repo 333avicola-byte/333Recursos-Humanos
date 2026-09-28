@@ -89,6 +89,20 @@ details{margin-top:8px} summary{cursor:pointer;font:600 13px var(--display);colo
 .years.fil button{font-weight:700;padding:10px 20px;font-size:14px}
 .years button[aria-pressed="true"]{background:var(--azul);color:#fff;border-color:var(--azul)}
 tr.sel td{background:#EEF5FC;font-weight:600}
+.hero{grid-template-columns:1fr auto!important;align-items:center}
+.semaforo{border-radius:16px;padding:16px 20px;min-width:230px;max-width:280px;color:#1B2A3A;box-shadow:0 10px 30px -14px rgba(0,0,0,.35)}
+.semaforo .lamp{display:inline-flex;align-items:center;gap:8px;font:800 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.semaforo .lamp .dot{width:12px;height:12px;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px rgba(255,255,255,.55)}
+.semaforo .semv{font:800 30px/1.1 var(--display);margin-top:10px}
+.semaforo .semref{font-size:12px;margin-top:4px;line-height:1.45}
+.semaforo .fuente{display:inline-block;margin-top:6px;font-size:11px;opacity:.8}
+.semaforo .fuente a{color:inherit;font-weight:700;text-decoration:underline}
+.semaforo.sana{background:#E6F2D5;color:#3F6B12}
+.semaforo.cuidado{background:#FFF3C4;color:#7A5A00}
+.semaforo.corregir{background:#FBD9D5;color:#A3261A}
+@media (max-width:860px){.hero{grid-template-columns:1fr!important}.semaforo{max-width:none}}
+.kpis>*{min-width:0}
+@media (max-width:560px){.kpis{grid-template-columns:1fr 1fr}.kpi .eyebrow{letter-spacing:.04em;font-size:10px}}
 </style>
 <style id="volver-css">
 .volver{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;
@@ -100,36 +114,6 @@ tr.sel td{background:#EEF5FC;font-weight:600}
 @media (hover:hover){.volver:hover{background:#185a93;transform:translateX(-2px)}}
 .volver:focus-visible{outline:2px solid #E87722;outline-offset:3px}
 @media print{.volver{display:none}}
-
-.hero{grid-template-columns:1fr auto!important;align-items:end}
-.hero .vs{text-align:right;background:rgba(255,255,255,.12);border-radius:14px;padding:14px 18px;min-width:180px}
-.hero .vv{font:700 30px/1.1 var(--display);margin-top:6px}
-.hero .vs0{color:var(--hero-muted);font-size:13px;margin-top:2px}
-.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.kpi .s b{font-weight:700}
-.more summary{cursor:pointer;list-style:none;font:700 15px/1.3 var(--display);display:flex;align-items:center;gap:10px}
-.more summary::-webkit-details-marker{display:none}
-.plus{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--azul);color:#fff;font-size:16px;transition:transform .25s}
-.more[open] .plus{transform:rotate(45deg)}
-.more .tablebox{margin-top:12px}
-.more .msg{margin-top:10px}
-tr.tot td{font-weight:700;background:#F4F8FC}
-.hero .vs{border-radius:16px;padding:16px 20px;min-width:210px;transition:background .3s}
-.hero .vs .vv{font-size:36px;margin-top:8px}
-.hero .vs .eyebrow,.hero .vs .vs0{color:inherit;opacity:.85}
-.hero .vs{box-shadow:0 10px 30px -14px rgba(0,0,0,.35)}
-.kpi{border-left:5px solid var(--c,var(--line))}
-.pulso .phead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
-.pulso h2 span{color:var(--muted);font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chipb{border-radius:999px;padding:7px 14px;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:600}
-.chipb.on{background:var(--azul);border-color:var(--azul);color:#fff}
-.big-chart{height:340px}
-@media (max-width:560px){.big-chart{height:300px}}
-.wrap>*{min-width:0}
-.more th:nth-child(2),.more td:nth-child(2),.more th:nth-child(3),.more td:nth-child(3){text-align:left}
-@media (max-width:420px){.big{font-size:38px}.big small{display:block;margin:6px 0 0}}
-@media (max-width:860px){.hero{grid-template-columns:1fr!important}.hero .vs{text-align:left}}
 </style>
 </head>
 <body>
@@ -157,6 +141,11 @@ tr.tot td{font-weight:700;background:#F4F8FC}
       <div class="eyebrow" id="heroEye">Índice de rotación del período</div>
       <div class="big" id="heroVal">—<small id="heroUnit"></small></div>
       <p id="heroTxt">Bajas acumuladas sobre la plantilla media de los meses cerrados.</p>
+    </div>
+      <div class="semaforo" id="sem" hidden>
+      <div class="lamp"><span class="dot"></span><span id="semTxt"></span></div>
+      <div class="semv" id="semVal"></div>
+      <div class="semref" id="semRef"></div>
     </div>
   </section>
 
@@ -234,6 +223,11 @@ const serial=v=>typeof v==="number"&&v>20000&&v<80000?new Date(Date.UTC(1899,11,
 const dmy=d=>d?String(d.getUTCDate()).padStart(2,"0")+"/"+String(d.getUTCMonth()+1).padStart(2,"0")+"/"+d.getUTCFullYear():"";
 let chart, chart2, pca=null, account=null, timer=null, P=null, MOVS=[], SEL=null, SELF=null;
 const PREFERIDA="LATAM"; // filial que se abre primero
+/* Semáforo: rotación VOLUNTARIA anualizada comparada con la referencia de Mercer
+   (2025 US Mercer Turnover Survey: 13% voluntaria promedio, todas las industrias).
+   Sana: por debajo de la referencia · Cuidado: hasta 1,5 veces · Corregir: más de 1,5 veces. */
+const REF={valor:0.13,fuente:"Mercer, US Turnover Survey 2025",url:"https://www.imercer.com/articleinsights/workforce-turnover-trends",cuidadoHasta:0.20};
+function semaforo(v){ if(v==null||!isFinite(v)) return null; return v<REF.valor?"sana":v<=REF.cuidadoHasta?"cuidado":"corregir"; }
 const COLORES=["#1F6DB1","#E87722","#8CC63F","#53565A","#2D85D1","#F5A35C"];
 function mostrar(){
   { const fa=[...new Set(P.filas.filter(f=>f.anio===SEL).map(f=>f.nombre))]; if(!fa.includes(SELF)) SELF=fa.includes(PREFERIDA)?PREFERIDA:fa[0]; }
@@ -298,6 +292,10 @@ function pintar(R){
   const chica=R.media<P.umbral;
   $("heroVal").firstChild.nodeValue=pf(R.indice);
   $("heroEye").textContent=`Rotación ${SELF} · ${R.anio}${R.corte<12?" (en curso)":""}`;
+  { const volAnual=R.media>0?R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)/R.media*12/R.corte:null, e=semaforo(volAnual);
+    $("sem").hidden=!e; if(e){ $("sem").className="semaforo "+e; $("semTxt").textContent={sana:"Sana",cuidado:"Cuidado",corregir:"Corregir"}[e];
+      $("semVal").textContent=pf(volAnual);
+      $("semRef").innerHTML=`Rotación voluntaria anualizada${chica?" · equipo chico, leer con cautela":""}<br>Sana &lt; ${pf(REF.valor)} · Cuidado hasta ${pf(REF.cuidadoHasta)} · Corregir &gt; ${pf(REF.cuidadoHasta)}<br><span class="fuente">Fuente: <a href="${REF.url}" target="_blank" rel="noopener">${REF.fuente}</a> · promedio voluntario ${pf(REF.valor)}</span>`; } }
   $("heroTxt").textContent=`${R.ambito}: ${R.totBajas} ${R.totBajas===1?"baja":"bajas"} y ${R.totAltas} ${R.totAltas===1?"alta":"altas"} entre enero y ${MESES[R.corte-1].toLowerCase()} de ${R.anio}, sobre una plantilla media de ${nf(R.media)} personas.`+(chica?` Equipo chico (menos de ${P.umbral} personas): cada baja mueve mucho el porcentaje.`:"");
   $("kVol").textContent=pf(R.iVol); $("kVolS").textContent=`${R.vol.slice(0,R.corte).reduce((a,b)=>a+b,0)} de ${R.totBajas} bajas`;
   $("kAnual").textContent=pf(R.anual); $("kAnualS").textContent=`Ritmo de ${R.corte} ${R.corte===1?"mes":"meses"} llevado a 12`; if(R.corte===12) $("kAnualS").textContent="Año cerrado: coincide con el índice";
