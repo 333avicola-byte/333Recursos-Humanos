@@ -65,7 +65,14 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
 .chg{text-align:right;font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .items{padding:0 0 10px 34px}
 .row{display:grid;grid-template-columns:1fr 44px 64px;gap:10px;align-items:center;padding:6px 0;font-size:12.5px}
-.mini{position:relative;height:230px;margin:6px 0 10px}
+.mini{position:relative;height:210px;margin:4px 0 6px}
+#list{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dimcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.dimhead{display:grid;grid-template-columns:1fr 44px 64px;gap:10px;align-items:center}
+.dimcard details{border-top:1px solid var(--line)}
+.qsum{grid-template-columns:24px 1fr!important;padding:8px 0!important}
+.dimcard .items{padding:0 0 6px 0}
+@media (max-width:760px){#list{grid-template-columns:1fr}}
 .qn{color:var(--azul);margin-right:4px}
 .bars{display:grid;gap:3px;margin-top:4px}
 .bars span{display:block;height:6px;border-radius:3px}
@@ -119,7 +126,7 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
     <nav class="years" id="years" aria-label="Elegir mediciones a comparar"></nav>
     <div class="chart"><canvas id="c1" aria-label="Promedio por dimensión y ola"></canvas></div>
   </section>
-  <details class="panel more">
+  <details class="panel more" open>
     <summary class="moresum"><span class="plus" aria-hidden="true"></span><span><b>Ver detalle</b><span class="sub"> · pulso de las 5 preguntas de cada dimensión</span></span></summary>
     <div id="list"></div>
   </details>
@@ -202,16 +209,19 @@ function render(){
   let q=0;
   const rows=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([x,i])=>{q++;const pb=ob.items[i].p,pa=oa?oa.items[i].p:null;
    return `<div class="row"><div><b class="qn">P${q}</b> ${x.i}</div><span class="val ${pb!=null&&pb<S.th.min?'low':''}">${nf(pb)}</span><span class="chg">${chg(pa!=null&&pb!=null?pb-pa:null)}</span></div>`}).join('');
-  return `<details data-d="${d}"><summary><span class="plus" aria-hidden="true"></span><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span><span class="chg">${chg(a!=null?b-a:null)}</span></summary><div class="items"><div class="mini"><canvas aria-label="Pulso de ${d}"></canvas></div>${rows}</div></details>`}).join('');
- $('list').querySelectorAll('details').forEach(el=>el.addEventListener('toggle',()=>{ if(el.open) pulso(el); }));
+  return `<div class="dimcard" data-d="${d}"><div class="dimhead"><span class="nm">${d}</span><span class="val ${b<S.th.min?'low':''}">${nf(b)}</span><span class="chg">${chg(a!=null?b-a:null)}</span></div>
+   <div class="mini"><canvas aria-label="Pulso de ${d}"></canvas></div>
+   <details><summary class="qsum"><span class="plus" aria-hidden="true"></span><span class="sub">Ver las 5 preguntas</span></summary><div class="items">${rows}</div></details></div>`}).join('');
+ dibujarTodos();
 }
 
 let DET=null; const MINI=new Map();
 function colP(v,dl){ if(dl!=null){ if(dl>=S.th.delta) return '#5E9A1E'; if(dl<=-S.th.delta){const t=Math.min(1,(-dl-S.th.delta)/(S.th.delta*2)),A=[246,214,120],B=[217,48,37];return '#'+A.map((c,j)=>Math.round(c+(B[j]-c)*t).toString(16).padStart(2,'0')).join('')} return '#1F6DB1'; }
   return v!=null&&v<S.th.min?css('--naranja'):'#1F6DB1'; }
+function dibujarTodos(){ const m=document.querySelector('details.more'); if(!m||!m.open) return; document.querySelectorAll('#list .dimcard').forEach(pulso); }
 function pulso(el){
  if(!window.Chart||!DET) return;
- const d=el.dataset.d, cv=el.querySelector('canvas'); const {V,oa}=DET, n=V.length;
+ const d=el.dataset.d, cv=el.querySelector('.mini canvas'); const {V,oa}=DET, n=V.length;
  const idx=ITEMS.map((x,i)=>[x,i]).filter(([x])=>x.d===d).map(([,i])=>i);
  const NARROW=innerWidth<640, GR=['#B7BCC2','#8A9099','#53565A'];
  const g0=cv.getContext('2d'), grad=g0.createLinearGradient(0,0,0,240); grad.addColorStop(0,'rgba(31,109,177,.22)'); grad.addColorStop(1,'rgba(31,109,177,0)');
@@ -229,7 +239,7 @@ function pulso(el){
    const txt=dl!=null?`${dl>=S.th.delta?'▲ ':dl<=-S.th.delta?'▼ ':''}${dl>0?'+':''}${nf(dl)}`:nf(v), col=colP(v,dl), w=gx.measureText(txt).width+12, x=Math.max(p.x,c.chartArea.left+w/2), y=p.y-(innerWidth<640&&k%2?34:20);
    gx.fillStyle=col;gx.beginPath();gx.roundRect?gx.roundRect(x-w/2,y-9,w,18,9):gx.rect(x-w/2,y-9,w,18);gx.fill();
    gx.fillStyle=(dl!=null&&dl<=-S.th.delta&&-dl<S.th.delta*2)?'#1B2A3A':'#fff';gx.fillText(txt,x,y+1);});gx.restore();}};
- const opts={maintainAspectRatio:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:innerWidth<640?40:26,left:4,right:8}},
+ const opts={maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},layout:{padding:{top:innerWidth<640?40:26,left:4,right:8}},
   animations:{y:{duration:1100,easing:'easeOutElastic',from:ctx=>ctx.type==='data'&&ctx.chart.chartArea?ctx.chart.chartArea.bottom:undefined}},
   scales:{y:{min:Math.max(1,Math.floor((Math.min(S.th.min,...all)-.4)*2)/2),max:5.2,ticks:{stepSize:.5,callback:v=>v<=5?nf(v).replace(',00',''):'',font:{family:FONT,size:10}},grid:{color:css('--line')}},
           x:{offset:true,grid:{display:false},ticks:{font:{family:FONT,size:11,weight:'700'},color:css('--ink')}}},
@@ -240,6 +250,7 @@ function pulso(el){
  MINI.set(cv,new Chart(cv,{type:'line',data:{labels:idx.map((_,k)=>'P'+(k+1)),datasets:ds},options:opts,plugins:[minH,pills]}));
 }
 
+document.addEventListener('toggle',e=>{ if(e.target.matches&&e.target.matches('details.more')&&e.target.open) dibujarTodos(); },true);
 // ---- lectura en vivo del Excel (misma conexión que RPE y Rotación)
 function setChip(c,t){$('chip').className='chip '+c;$('chipText').textContent=t}
 let pca=null,account=null,timer=null;
