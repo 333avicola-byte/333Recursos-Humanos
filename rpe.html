@@ -112,6 +112,16 @@ tr.tot td{font-weight:700;background:#F4F8FC}
 .big-chart{height:340px}
 @media (max-width:560px){.big-chart{height:300px}}
 .wrap>*{min-width:0}
+.ref{margin-top:14px;position:relative;display:inline-block}
+.refb{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px;cursor:help;outline:none}
+.refb:focus-visible{box-shadow:0 0 0 2px #fff}
+.ri{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;font-weight:800}
+.refb.ok{background:#E6F2D5;color:#3F6B12}.refb.bajo{background:#FFF3C4;color:#7A5A00}
+.refs{position:absolute;left:0;top:calc(100% + 8px);z-index:20;width:min(420px,80vw);padding:12px 14px;border-radius:12px;
+  background:#fff;color:#1B2A3A;font-size:12px;line-height:1.5;box-shadow:0 18px 40px -16px rgba(14,27,43,.45);
+  opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .2s,transform .2s,visibility .2s}
+.refs a{color:#1F6DB1;font-weight:700}
+.ref:hover .refs,.ref:focus-within .refs{opacity:1;visibility:visible;transform:none}
 .more th:nth-child(2),.more td:nth-child(2),.more th:nth-child(3),.more td:nth-child(3){text-align:left}
 @media (max-width:420px){.big{font-size:38px}.big small{display:block;margin:6px 0 0}}
 @media (max-width:860px){.hero{grid-template-columns:1fr!important}.hero .vs{text-align:left}}
@@ -143,6 +153,7 @@ tr.tot td{font-weight:700;background:#F4F8FC}
       <div class="eyebrow" id="hEye">RPE 333 · 2026 proyectado</div>
       <div class="big" id="hVal">—<small>por persona / año</small></div>
       <p id="hTxt"></p>
+      <div class="ref" id="hRef"></div>
     </div>
     <div class="vs" id="hVs"></div>
   </section>
@@ -189,6 +200,8 @@ function colorVar(v){
   const t=Math.min(1,-v/CAIDA), A=[246,214,120], B=[217,48,37];
   return "#"+A.map((c,i)=>Math.round(c+(B[i]-c)*t).toString(16).padStart(2,"0")).join("");
 }
+/* Referencia de mercado para el RPE */
+const REF={agencias:163000,latam:100000,url:"https://iota-finance.com/iota-finance-blog/revenue-per-employee"};
 const arrow=v=>!isFinite(v)?"":v>=0?"▲":"▼";
 let ch1;
 
@@ -210,6 +223,9 @@ function render(){
   $("hEye").textContent=`RPE 333 · ${act} ${proy(T1.t)?"proyectado":"real"}`;
   $("hVal").firstChild.nodeValue=fmt(r1);
   $("hTxt").textContent=T0?`La facturación ${vF>=0?"crece":"cae"} ${pct(vF)} y el equipo ${vE>=0?"crece":"baja"} ${pct(vE)} (FTE promedio ${dec(T0.fte)} → ${dec(T1.fte)}). ${v>=0?"Cada persona factura más que el año anterior.":"Cada persona factura menos que el año anterior."}`:"Facturación del año ÷ FTE promedio del año.";
+  { const ok=r1>=REF.latam; $("hRef").innerHTML=`<span class="refb ${ok?"ok":"bajo"}" tabindex="0" aria-describedby="refTip">${ok?"✓ RPE sano":"⚠ RPE bajo"} para una empresa de comunicación en LATAM <i class="ri">i</i></span>
+    <span class="refs" id="refTip" role="tooltip">Referencia: agencias de comunicación ${fmt(REF.agencias)} por persona (EE. UU.) · en LATAM, con menor costo laboral, desde ${fmt(REF.latam)} se considera sano.<br>
+    Fuente: <a href="${REF.url}" target="_blank" rel="noopener">Promethean Research, State of Digital Services 2026</a> (datos 2025, vía Iota Finance).</span>`; }
   $("hVs").style.background=T0?colorVar(v):""; $("hVs").style.color=(v<0&&-v<CAIDA*.55)?"#1B2A3A":"#fff";
   $("hVs").innerHTML=T0?`<div class="eyebrow">Variación vs ${esc(lbl(ant,T0.t))}</div><div class="vv">${arrow(v)} ${pct(v)}</div><div class="vs0">${esc(ant)}: ${fmt(r0)}</div>`:"";
   $("fil").innerHTML=M.fils.map(f=>{
