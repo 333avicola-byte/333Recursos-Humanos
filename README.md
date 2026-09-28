@@ -11,7 +11,7 @@ tocar nada más.
 
 | Herramienta | Link | Descripción | Datos |
 |---|---|---|---|
-| Tablero RPE | rpe.html | Revenue per Employee: cuánto aporta cada FTE a la facturación mensual. | Excel "RPE KPI" · SharePoint |
+| Tablero RPE | rpe.html | Revenue per Employee anual por filial: 2025 real vs 2026 proyectado. | Excel "RPE Anual 333" · SharePoint |
 | Índice de rotación | rotacion.html | Altas, bajas, rotación voluntaria, bajas tempranas y proyección anualizada. | Excel "Rotacion 333" · SharePoint |
 | Equipo con Futuro | teambuilding.html | Las 8 dimensiones del equipo medidas cada 6 meses: qué mejoró, qué bajó y qué atacar en capacitación. | Excel "Equipo con Futuro 333" · SharePoint |
 | Pirámide de jerarquías | piramide.html | Los cinco niveles de responsabilidad y las posiciones típicas de cada uno. | Contenido fijo en el archivo |
@@ -24,6 +24,13 @@ texto y **Datos** la etiqueta gris de abajo. El orden de las filas es el orden d
 1. Cargar el mes en el Excel correspondiente, en SharePoint (333 Recruitment › GESTION INTERNA › KPI COSTOS).
 2. En "Rotacion 333", actualizar además el último mes cerrado en la hoja Parametros.
 3. Los tableros releen el Excel solos cada pocos minutos; no hay que tocar GitHub.
+
+## Actualización anual (RPE)
+
+1. En el Excel "RPE Anual 333" (SharePoint › KPI COSTOS), hoja **Anual**: cargar la facturación en USD de cada filial.
+2. Hoja **FTE mensual**: cargar el FTE de cada mes por filial (el año en curso: meses reales + dotación prevista).
+3. Al cerrar el año, cambiar Tipo de "Proyectado" a "Real" y cargar el cierre. Para un año nuevo, sumar sus filas copiando el formato.
+4. El tablero compara el último año contra el anterior. Colores de la variación: verde si sube; si cae, de amarillo suave a rojo (−10% o más).
 
 ## Actualización semestral (Equipo con Futuro)
 
