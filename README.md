@@ -58,3 +58,16 @@ datos a quien tenga acceso al archivo. La pirámide y la portada son públicas.
   redirección SPA en esa aplicación.
 - Si un Excel cambia de nombre o de carpeta, hay que actualizar su dirección interna dentro del
   HTML del tablero (bloque CONFIG).
+
+## App en el teléfono
+
+El sitio se instala como app (ícono propio, pantalla completa, sin barra del navegador). Es una
+sola vez por teléfono:
+
+- **Android:** abrir el link en Chrome › menú ⋮ › **Instalar app**.
+- **iPhone:** abrir el link en Safari › Compartir › **Agregar a pantalla de inicio**.
+
+En iPhone la app guarda su propia sesión: la primera vez pide iniciar sesión con la cuenta de 333.
+Manteniendo apretado el ícono (Android) aparecen accesos directos a cada tablero; se definen en
+`manifest.webmanifest`. Las páginas nuevas tienen que llevar el bloque «App instalable (PWA)» del
+`<head>` de index.html.

@@ -97,6 +97,16 @@ details[open] .plus::after{content:"−"}details:not([open]) .plus::after{conten
 .volver:focus-visible{outline:2px solid #E87722;outline-offset:3px}
 @media print{.volver{display:none}}
 </style>
+<!-- App instalable (PWA): manifest, íconos y service worker -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FBFBFD">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KPI 333">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>if("serviceWorker" in navigator) addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
 </head>
 <body>
 <a class="volver" href="./" id="volver" aria-label="Volver a los indicadores"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Indicadores</a>

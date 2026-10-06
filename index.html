@@ -211,6 +211,16 @@ footer{border-top:1px solid var(--line);padding:26px 22px calc(40px + env(safe-a
   .hero{height:auto}.hero-stick{position:relative;top:0}
 }
 </style>
+<!-- App instalable (PWA): manifest, íconos y service worker -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FBFBFD">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KPI 333">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>if("serviceWorker" in navigator) addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
 </head>
 <body>
 
