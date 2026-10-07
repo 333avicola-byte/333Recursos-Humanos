@@ -285,7 +285,8 @@ function charts(M,act,ant){
           return [`Variación RPE: ${pct(vari(f))}`,`Facturación: ${pct(A.fac/B.fac-1)} · FTE: ${pct(A.fte/B.fte-1)}`]; }}}},
     scales:{x:{grid:{display:false},offset:true,ticks:{font:{weight:"700"}}},y:{grace:"15%",grid:{color:css("--line")},ticks:{callback:v=>fmtK(v)}}}};
   const d1={labels:grupos,datasets:ds};
-  if(ch1){ch1.data=d1;ch1.options=o1;ch1.update();} else ch1=new Chart(cv,{type:"line",data:d1,options:o1,plugins:[etiquetas]});
+  if(ch1) ch1.destroy(); // se recrea para que las etiquetas usen los datos nuevos
+  ch1=new Chart(cv,{type:"line",data:d1,options:o1,plugins:[etiquetas]});
 }
 
 /* ---------- Lectura de la hoja "Anual" ---------- */
